@@ -6,10 +6,6 @@ To start developing for Android, run:
 npm run android
 ```
 
-## Emulator Setup
+## Set Up Your Environment
 
-Follow [the official documentation from Expo](https://docs.expo.dev/get-started/set-up-your-environment/?platform=android&device=simulated&mode=expo-go) to set up your development environment for Android.
-
-## Physical Device Setup
-
-Follow [the official documentation from Expo](https://docs.expo.dev/get-started/set-up-your-environment/?platform=android&device=physical&mode=expo-go) to set up your development environment for Android.
+Follow [the official documentation from React Native](https://reactnative.dev/docs/set-up-your-environment?os=windows&platform=android) to set up your development environment for Android.
