@@ -2,7 +2,7 @@ import { Button } from "@/components/Button";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Text, View} from "react-native";
+import { Text, View, TouchableOpacity} from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -24,14 +24,16 @@ export default function CameraScreen() {
     return <Text>Loading camera...</Text>
   }
 
-  if (!cameraPermission.granted) {
-    // Camera permissions are not granted yet.
-    return (
-      <View className="mb-3 aspect-square w-full rounded-2xl border border-[#B1B1B1] bg-black">
-
-      </View>
-    );
-  }
+if (!cameraPermission?.granted) {
+  return (
+    <View className="flex-1 items-center justify-center bg-black p-6">
+      <Text className="text-white text-center mb-4">
+        We need your permission to show the camera
+      </Text>
+      <Button onPress={requestCameraPermission} label="Grant permission" />
+    </View>
+  );
+}
 
   function toggleCameraFacing() {
     setFacing((current) => (current === "back" ? "front" : "back"));
