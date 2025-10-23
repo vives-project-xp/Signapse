@@ -25,7 +25,7 @@ export default function Settings() {
     const [selected, setSelected] = useState(item.options?.[0]?.value ?? "");
 
     return (
-      <View className="mb-4 w-full items-center rounded-xl bg-white p-4 shadow-md">
+      <View className="mb-3 w-full items-center rounded-xl bg-white p-4 shadow-sm">
         <Text className="mb-2 text-center text-lg font-semibold text-gray-800">{item.title}</Text>
 
         {/* members row */}
@@ -136,23 +136,15 @@ export default function Settings() {
   ];
 
   return (
-    <View className="flex-1 bg-gray-100 px-5 py-6">
+    <View className="flex-1 bg-gray-100 px-3">
       <FlatList
         data={SettingsData}
         keyExtractor={(item) => item.key}
         renderItem={({ item }) => <Item item={item} />}
         className="w-full"
-        contentContainerStyle={{ paddingBottom: 28, paddingTop: 6 }}
+        contentContainerStyle={{ paddingBottom: 28, paddingTop: 10}}
         showsVerticalScrollIndicator={false}
       />
-
-      <Pressable
-        accessibilityRole="button"
-        onPress={handleback}
-        className="mt-4 self-center rounded-full border border-gray-300 bg-white px-8 py-3"
-      >
-        <Text className="text-base font-semibold text-gray-800">Back</Text>
-      </Pressable>
     </View>
   );
 }
