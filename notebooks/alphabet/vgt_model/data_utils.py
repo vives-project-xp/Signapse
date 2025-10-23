@@ -4,7 +4,9 @@ import torch
 from torch.utils.data import Dataset, DataLoader, random_split
 import numpy as np
 import json
-from typing import List
+import random
+import math
+from typing import List, Tuple
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(THIS_DIR, "dataset", "images")
@@ -12,7 +14,16 @@ HAND_LANDMARKS_JSON = os.path.join(DATA_DIR, "hand_landmarks.json")
 
 # Dataset class for hand landmarks
 class LandmarksDataset(Dataset):
-    def __init__(self, X: np.ndarray, y: np.ndarray, classes: List[str]):
+    def __init__(
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        classes: List[str],
+        augment: bool = False,
+        augment_prob: float = 0.5,
+        noise_std: float = 0.01,
+        rotate_deg: float = 10.0,
+    ):
         # Accept either flattened vectors (num_samples, 63) or sequences (num_samples, 21, 3)
         if not ((X.ndim == 2 and X.shape[1] == 63) or (X.ndim == 3 and X.shape[1:] == (21, 3))):
             raise AssertionError("Expected X to have shape (num_samples, 63) or (num_samples, 21, 3) for 21 landmarks with (x,y,z) coords")
@@ -20,13 +31,30 @@ class LandmarksDataset(Dataset):
         self.X = X
         self.y = y
         self.classes = classes
+        self.is_flat = (X.ndim == 2)
+        # Augmentation config
+        self.augment = augment
+        self.augment_prob = augment_prob
+        self.noise_std = noise_std
+        self.rotate_deg = rotate_deg
 
     def __len__(self) -> int:
         return self.X.shape[0]
     
     def __getitem__(self, idx: int):
         # return float tensor; keep shape as either (63,) or (21,3)
-        x = torch.from_numpy(self.X[idx]).float()
+        x_np = self.X[idx].copy()
+
+        # Optional light augmentations for robustness
+        if self.augment and random.random() < self.augment_prob:
+            if self.is_flat:
+                pts = x_np.reshape(21, 3)
+            else:
+                pts = x_np
+            pts = apply_augmentations(pts, noise_std=self.noise_std, max_rotate_deg=self.rotate_deg)
+            x_np = pts.reshape(-1) if self.is_flat else pts
+
+        x = torch.from_numpy(x_np).float()
         y = torch.tensor(self.y[idx], dtype=torch.long)
         return x, y
 
@@ -55,7 +83,15 @@ def normalize_landmarks(lm, root_idx=0, scale_method="wrist_to_middle"):
     arr = arr / scale
     return arr
 
-def load_dataset_normalized(json_file: str, as_sequence: bool = True, scale_method: str = "wrist_to_middle") -> LandmarksDataset:
+def load_dataset_normalized(
+    json_file: str,
+    as_sequence: bool = True,
+    scale_method: str = "wrist_to_middle",
+    augment: bool = False,
+    augment_prob: float = 0.5,
+    noise_std: float = 0.01,
+    rotate_deg: float = 10.0,
+) -> LandmarksDataset:
     """
     Load dataset and normalize landmarks per-sample.
     - as_sequence=True -> X shape (n,21,3)
@@ -78,7 +114,15 @@ def load_dataset_normalized(json_file: str, as_sequence: bool = True, scale_meth
     else:
         X = np.stack(X_list).reshape(len(df), -1).astype(np.float32)  # (n,63)
 
-    return LandmarksDataset(X, y, classes)
+    return LandmarksDataset(
+        X,
+        y,
+        classes,
+        augment=augment,
+        augment_prob=augment_prob,
+        noise_std=noise_std,
+        rotate_deg=rotate_deg,
+    )
 
 # Get classes
 def get_classes() -> List[str]:
@@ -102,3 +146,41 @@ def get_loaders(train_dataset: LandmarksDataset, val_dataset: LandmarksDataset, 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
     return train_loader, val_loader
+
+
+# ----- Augmentations for 3D hand landmarks -----
+def random_rotation_matrix(max_deg: float = 10.0) -> np.ndarray:
+    """Small random rotation around z-axis (camera facing) plus tiny tilt on x/y."""
+    # Convert degrees to radians
+    az = math.radians(random.uniform(-max_deg, max_deg))
+    ax = math.radians(random.uniform(-max_deg * 0.2, max_deg * 0.2))
+    ay = math.radians(random.uniform(-max_deg * 0.2, max_deg * 0.2))
+
+    Rx = np.array(
+        [[1, 0, 0], [0, math.cos(ax), -math.sin(ax)], [0, math.sin(ax), math.cos(ax)]],
+        dtype=np.float32,
+    )
+    Ry = np.array(
+        [[math.cos(ay), 0, math.sin(ay)], [0, 1, 0], [-math.sin(ay), 0, math.cos(ay)]],
+        dtype=np.float32,
+    )
+    Rz = np.array(
+        [[math.cos(az), -math.sin(az), 0], [math.sin(az), math.cos(az), 0], [0, 0, 1]],
+        dtype=np.float32,
+    )
+    return Rz @ Ry @ Rx
+
+
+def apply_augmentations(points: np.ndarray, noise_std: float = 0.01, max_rotate_deg: float = 10.0) -> np.ndarray:
+    """
+    Apply light jitter and small rotation to normalized hand landmarks.
+    points: (21, 3) numpy array
+    """
+    assert points.shape == (21, 3)
+    # Small rotation
+    R = random_rotation_matrix(max_rotate_deg)
+    pts = (R @ points.T).T
+    # Gaussian noise
+    if noise_std > 0:
+        pts = pts + np.random.normal(0.0, noise_std, size=pts.shape).astype(np.float32)
+    return pts.astype(np.float32)

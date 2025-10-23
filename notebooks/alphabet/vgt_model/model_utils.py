@@ -8,19 +8,26 @@ MODEL_DIR = os.path.join(THIS_DIR, "models")
 
 def create_model(num_classes: int, in_dim: int):
     """
-    Create a simple feedforward neural network model for hand landmark classification.
+    Create a deeper feedforward neural network model for hand landmark classification.
+    Includes batch normalization for better training stability and handling of subtle differences.
 
     Args:
         num_classes: number of output classes.
         in_dim: number of input features.
     """
     model = nn.Sequential(
-            nn.Linear(in_dim, 256),
+            nn.Linear(in_dim, 512),
+            nn.BatchNorm1d(512),
             nn.ReLU(inplace=True),
-            nn.Dropout(0.2),
-            nn.Linear(256, 256),
+            nn.Dropout(0.3),
+            nn.Linear(512, 512),
+            nn.BatchNorm1d(512),
             nn.ReLU(inplace=True),
-            nn.Dropout(0.2),
+            nn.Dropout(0.3),
+            nn.Linear(512, 256),
+            nn.BatchNorm1d(256),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.3),
             nn.Linear(256, num_classes)
     )
     return model.to(DEVICE)

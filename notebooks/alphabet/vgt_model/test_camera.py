@@ -38,7 +38,7 @@ def main(args):
     parser = argparse.ArgumentParser()
     parser.add_argument('--camera', type=int, default=0)
     parser.add_argument('--model', type=str, default=None, help='Path to .pth weights (optional)')
-    parser.add_argument('--interval', type=float, default=5.0, help='Seconds between predictions')
+    parser.add_argument('--interval', type=float, default=1, help='Seconds between predictions')
     parsed = parser.parse_args(args)
 
     classes = get_classes()
