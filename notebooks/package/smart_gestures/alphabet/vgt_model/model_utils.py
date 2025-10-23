@@ -40,7 +40,7 @@ def save_model(model, path='hand_gesture_model.pth'):
         os.makedirs(MODEL_DIR)
     torch.save(model.state_dict(), os.path.join(MODEL_DIR, path))
 
-def load_model(model, path='hand_gesture_model.pth'):
+def load_model(model: nn.Module, path: str='hand_gesture_model.pth')-> nn.Module:
     """
     Load the model state dictionary from a file.
     """

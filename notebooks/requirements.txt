@@ -76,7 +76,7 @@ tzdata==2025.2
 urllib3==2.5.0
 wcwidth==0.2.14
 wheel==0.45.1
-torch==2.7.0
+torch~=2.7.0
 torchvision==0.22.0
 onnx==1.19.0
 notebook==7.0.0
