@@ -16,48 +16,47 @@ export default function Index() {
   };
 
   return (
-    <View className="flex-1 bg-[#F2F2F2] justify-center items-center px-6 sm:px-8 md:px-12">
-      <View className="w-full max-w-[640px] items-center">
+    <View className="flex-1 bg-[#F2F2F2] justify-center items-center p-5">
+      <View className="items-center max-w-[300px]">
         <Image
           source={require('../assets/images/Handsymbol.png')}
-          resizeMode="contain"
-          className="w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 max-w-[128px] max-h-[128px]" 
+          style={{ width: 100, height: 100 }}
         />
 
-        <Text className="mt-4 text-3xl md:text-4xl lg:text-5xl font-bold text-[#333333] text-center">Smartglasses</Text>
-        <Text className="mt-2 text-base md:tesxt-lg text-[#666666] text-center leading-6">
+        <Text className="text-4xl font-bold text-[#333333] text-center mb-5">Smartglasses</Text>
+        <Text className="text-base text-[#666666] text-center leading-6 mb-10">
           Gestures to text & speech
         </Text>
 
-        <View className="mt-6 w-full">
+        <View className="self-stretch">
           <Button
             size="lg"
-            className="w-full bg-black rounded-lg"
+            className="bg-black py-4 rounded-lg w-full mb-5"
             label="Start detection"
             labelClasses="text-white text-lg font-semibold"
             onPress={handleGetStarted}
           />
         </View>
 
-        <View className="mt-3 w-full flex-col md:flex-row gap-3">
+        <View className="flex-row self-stretch">
           <Button
             label="About"
-            className="w-full md:w-auto md:flex-1 bg-white px-10 border-2 rounded-lg border-[#B1B1B1]"
+            className="bg-white px-10 py-4 border-2 rounded-lg border-[#B1B1B1] mr-3 flex-1"
             labelClasses="text-black text-lg font-semibold"
             onPress={handleAbout}
-            size="lg"
+            size="default"
             variant="secondary"
           />
           <Button
             label="Settings"
-            className="w-full md:w-auto md:flex-1 bg-white px-10 border-2 rounded-lg border-[#B1B1B1]"
+            className="bg-white px-10 py-4 border-2 rounded-lg border-[#B1B1B1] flex-1"
             labelClasses="text-black text-lg font-semibold"
             onPress={handleSettings}
-            size="lg"
+            size="default"
             variant="secondary"
           />
         </View>
       </View>
     </View>
   );
-};
+}
