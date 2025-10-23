@@ -213,4 +213,6 @@ notebooks/images/*
 !notebooks/images/.lakefs_ref.yaml
 notebooks/alphabet/images/*
 !notebooks/alphabet/images/.lakefs_ref.yaml
+notebooks/alphabet/vgt_model/dataset/images/*
+!notebooks/alphabet/vgt_model/.lakefs_ref.yaml
 # End ignored by lakectl local
