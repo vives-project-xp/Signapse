@@ -1,23 +1,24 @@
 import torch.optim as optim
 import torch.nn as nn
 import torch
-from typing import Optional, Dict, Tuple
+from typing import Optional, Dict, Tuple, Any
 from model_utils import DEVICE
 from tqdm import tqdm
+from torch.utils.data import DataLoader
 from callbacks import create_scheduler, EarlyStopping, ModelCheckpoint
 
 def train_model(
     model: torch.nn.Module,
-    train_loader,
-    val_loader=None,
+    train_loader: DataLoader[Any],
+    val_loader: DataLoader[Any] | None= None,
     epochs: int = 50,
     lr: float = 1e-3,
     scheduler_type: Optional[str] = None,
-    scheduler_kwargs: Optional[Dict] = None,
-    early_stopping_kwargs: Optional[Dict] = None,
-    checkpoint_kwargs: Optional[Dict] = None,
+    scheduler_kwargs: Optional[dict[str, Any]] = None,
+    early_stopping_kwargs: Optional[dict[str, Any]] = None,
+    checkpoint_kwargs: Optional[dict[str, Any]] = None,
     verbose: bool = True,
-):
+)-> None:
     """
     Train the given model using the provided DataLoader(s), with optional callbacks.
 
@@ -110,7 +111,7 @@ def train_model(
         if early_stopper is not None and early_stopper.should_stop:
             break
 
-def evaluate_model(model, dataloader):
+def evaluate_model(model: nn.Module, dataloader: DataLoader[dict[str, Any]]) -> float:
     """
     Evaluate the model on the provided DataLoader.
     """
@@ -125,11 +126,10 @@ def evaluate_model(model, dataloader):
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
     accuracy = 100 * correct / total
-    print(f'Accuracy: {accuracy:.2f}%')
     return accuracy
 
 
-def evaluate_metrics(model, dataloader, criterion: Optional[nn.Module] = None) -> Tuple[float, float]:
+def evaluate_metrics(model: nn.Module, dataloader: DataLoader[dict[str, Any]], criterion: Optional[nn.Module] = None) -> Tuple[float, float]:
     """Return (avg_loss, accuracy_percent) for a dataloader."""
     was_training = model.training
     model.eval()

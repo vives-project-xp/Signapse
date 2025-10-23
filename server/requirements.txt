@@ -1,1 +1,7 @@
-fastapi[standard]
+fastapi[standard]~=0.119.0
+torch~=2.9.0
+numpy~=2.3.4
+pandas~=2.3.3
+typing_extensions~=4.15.0
+
+../notebooks/package

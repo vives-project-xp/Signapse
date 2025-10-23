@@ -1,0 +1,9 @@
+{
+  // Workspace settings: help Pylance find the editable package installed from ../notebooks/package
+  "python.analysis.extraPaths": [
+    "/workspaces/SmartGlasses/notebooks/package",
+    "./notebooks/package"
+  ],
+  // Optional: silence some type checking noise
+  "python.analysis.typeCheckingMode": "basic"
+}

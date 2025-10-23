@@ -31,6 +31,9 @@
     "files.autoSave": "afterDelay",
     "editor.tabSize": 2,
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.endOfLine": "lf",
+    "files.eol": "\n",
+    "files.insertFinalNewline": true
   }
 }

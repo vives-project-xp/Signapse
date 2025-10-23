@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "smart_gestures"
+version = "0.1.0"
+description = "Utilities and models for ASL alphabet training used in the SmartGlasses project"
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.12"
+authors = [
+	{ name = "Simon Stijnen"},
+	{ name = "Lynn Deleare"},
+	{ name = "Olivier Westerman"},
+]
+maintainers = [
+  {name = "VIVES University of Applied Sciences - Project XP"}
+]
+classifiers = [
+	"Programming Language :: Python :: 3",
+	"License :: OSI Approved :: MIT License",
+	"Operating System :: OS Independent",
+]
+
+[tool.setuptools]
+packages = { find = {} }
