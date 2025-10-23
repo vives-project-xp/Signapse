@@ -1,6 +1,11 @@
+import { router } from "expo-router";
 import { FlatList, Image, Linking, Pressable, Text, View } from "react-native";
 
 export default function About() {
+  const handleback = () => {
+    router.push("/");
+  };
+
   const renderItem = ({
     item,
   }: {
@@ -14,7 +19,7 @@ export default function About() {
     };
   }) => (
     // Card: full width, consistent padding, centered content
-    <View className="mb-4 w-full items-center rounded-xl bg-white p-4 shadow-md">
+    <View className="mb-3 w-full items-center rounded-xl bg-white p-4 shadow-sm">
       <Text className="mb-2 text-center text-lg font-semibold text-gray-800">{item.title}</Text>
 
       {/* members row: centered, wrapped */}
@@ -64,7 +69,7 @@ export default function About() {
       title: "About the project",
       content: "SmartGlasses — Sign Language → Text",
     },
-    {
+        {
       key: "idea",
       title: "Idea",
       content:
@@ -115,11 +120,15 @@ export default function About() {
   ];
 
   return (
+    <View className="flex-1 bg-gray-100 px-3">
       <FlatList
         data={aboutData}
         keyExtractor={(item) => item.key}
         renderItem={renderItem}
-        className="w-full pt-6"
+        className="w-full"
+        contentContainerStyle={{ paddingBottom: 28, paddingTop: 10 }}
+        showsVerticalScrollIndicator={false}
       />
+    </View>
   );
 }
