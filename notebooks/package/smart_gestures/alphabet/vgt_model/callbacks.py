@@ -5,7 +5,7 @@ import torch
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import ReduceLROnPlateau, StepLR, CosineAnnealingLR
 
-from model_utils import MODEL_DIR
+from .model_utils import MODEL_DIR
 
 
 class EarlyStopping:

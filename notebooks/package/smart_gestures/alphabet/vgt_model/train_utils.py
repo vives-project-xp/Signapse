@@ -2,10 +2,10 @@ import torch.optim as optim
 import torch.nn as nn
 import torch
 from typing import Optional, Dict, Tuple, Any
-from model_utils import DEVICE
 from tqdm import tqdm
 from torch.utils.data import DataLoader
-from callbacks import create_scheduler, EarlyStopping, ModelCheckpoint
+from .callbacks import create_scheduler, EarlyStopping, ModelCheckpoint
+from .model_utils import DEVICE
 
 def train_model(
     model: torch.nn.Module,
