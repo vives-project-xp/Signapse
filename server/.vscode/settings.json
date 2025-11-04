@@ -4,5 +4,12 @@
     "${workspaceFolder}/../notebooks/package"
   ],
   "python.analysis.typeCheckingMode": "strict",
-  "python.analysis.autoImportCompletions": true
+  "python.analysis.autoImportCompletions": true,
+  "python-envs.pythonProjects": [
+    {
+      "path": "",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
+    }
+  ]
 }

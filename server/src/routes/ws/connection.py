@@ -1,8 +1,7 @@
-from typing import Any, cast
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from const import __version__
 from websocket import connection_manager as manager
-from websocket.message import BaseMessage
+from websocket.message import Receive
 
 router = APIRouter()
 
@@ -18,7 +17,7 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             try:
-                data = cast(BaseMessage[Any], BaseMessage.model_validate_json(await websocket.receive_text()))
+                data = Receive.BaseMessage.model_validate_json(await websocket.receive_text())
             except Exception:
                 continue  # Ignore invalid messages
             await manager.handle_message(client_id, data)
