@@ -10,3 +10,15 @@ services:
     user: "${UID:-1000}:${GID:-1000}"
     ports:
       - "8085:8000"
+
+  server:
+    container_name: server
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8000/health"]
+      interval: 30s
