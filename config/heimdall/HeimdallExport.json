@@ -1,0 +1,42 @@
+[
+  {
+    "title": "Portainer",
+    "colour": "#161b1f",
+    "url": "http://gesture-project1.tail539c2b.ts.net:9000",
+    "description": "{\"enabled\":\"0\",\"dataonly\":\"1\",\"override_url\":null,\"username\":null,\"password\":null,\"ignore_tls\":\"0\"}",
+    "appid": "07b796b3a10eaa8b6f485ed2379187a39400b459",
+    "appdescription": "Portainer is a simple management solution for Docker. Easily manage your Docker hosts and Docker Swarm clusters via Portainer web user interface."
+  },
+  {
+    "title": "Swagger Docs",
+    "colour": "#161b1f",
+    "url": "http://gesture-project1.tail539c2b.ts.net:8000/docs",
+    "description": null,
+    "appid": "null",
+    "appdescription": null
+  },
+  {
+    "title": "Smartglasses Documentatie",
+    "colour": "#161b1f",
+    "url": "http://gesture-project1.tail539c2b.ts.net:8085/",
+    "description": null,
+    "appid": "null",
+    "appdescription": null
+  },
+  {
+    "title": "LakeFS",
+    "colour": "#161b1f",
+    "url": "http://gesture-project2.tail539c2b.ts.net:8000",
+    "description": null,
+    "appid": "null",
+    "appdescription": null
+  },
+  {
+    "title": "Minio",
+    "colour": "#161b1f",
+    "url": "http://gesture-project2.tail539c2b.ts.net:9001/",
+    "description": null,
+    "appid": "30747605e1f6faad5d1cedb2c7953d31ffad3fd4",
+    "appdescription": "Minio is an object storage server released under Apache License v2.0. It is compatible with Amazon S3 cloud storage service. It is best suited for storing unstructured data such as photos, videos, log files, backups and container / VM images."
+  }
+]
