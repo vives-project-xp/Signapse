@@ -22,3 +22,20 @@ services:
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:8000/health"]
       interval: 30s
+
+  heimdall:
+    image: linuxserver/heimdall:latest
+    container_name: heimdall
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Brussels
+    volumes:
+      - heimdall_data:/config
+      # - ./config/heimdall/heimdall.json:/config/heimdall.json:ro --- werkt niet
+
+volumes:
+  heimdall_data:
