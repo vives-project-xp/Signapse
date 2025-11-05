@@ -81,3 +81,4 @@ torchvision==0.22.0
 onnx==1.19.0
 notebook==7.0.0
 gradio==5.42.0
+transformers==4.44.2
