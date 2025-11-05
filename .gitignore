@@ -2,9 +2,8 @@
 
 templates/
 temp/
-notebooks/images
-notebooks/annotations
 .env
+notebooks/data
 
 # Visual Studio en andere standaard ignores
 *.rsuser
