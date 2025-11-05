@@ -1,9 +1,18 @@
 from fastapi import FastAPI
-
 from const import __version__
 from websocket.connection_manager import ConnectionManager
-
 import routes
+import os
+import logging
+
+# Reduce TensorFlow/absl/glog verbosity to avoid noisy startup logs from
+# MediaPipe / TensorFlow. These environment variables MUST be set before
+# importing any module that may in turn import mediapipe or tensorflow.
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")
+os.environ.setdefault("GLOG_minloglevel", "3")
+# Optionally silence absl python logger too
+logging.getLogger("absl").setLevel(logging.ERROR)
+
 
 manager = ConnectionManager()
 
@@ -17,3 +26,4 @@ app = FastAPI(
 app.include_router(routes.root.router)
 app.include_router(routes.ws.router)
 app.include_router(routes.alphabet.router)
+app.include_router(routes.keypoints.router)
