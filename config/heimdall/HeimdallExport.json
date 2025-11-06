@@ -1,11 +1,35 @@
 [
   {
-    "title": "Portainer",
+    "title": "Home page",
+    "colour": "#BDF",
+    "url": "https://smart-gestures.devbitapp.be/",
+    "description": null,
+    "appid": "null",
+    "appdescription": null
+  },
+  {
+    "title": "Swagger Docs",
+    "colour": "#BDF",
+    "url": "https://api.smart-gestures.devbitapp.be/docs",
+    "description": null,
+    "appid": "null",
+    "appdescription": null
+  },
+  {
+    "title": "Uptime Kuma",
     "colour": "#161b1f",
-    "url": "http://gesture-project1.tail539c2b.ts.net:9000",
-    "description": "{\"enabled\":\"0\",\"dataonly\":\"1\",\"override_url\":null,\"username\":null,\"password\":null,\"ignore_tls\":\"0\"}",
-    "appid": "07b796b3a10eaa8b6f485ed2379187a39400b459",
-    "appdescription": "Portainer is a simple management solution for Docker. Easily manage your Docker hosts and Docker Swarm clusters via Portainer web user interface."
+    "url": "http://gesture-project1.tail539c2b.ts.net:3001",
+    "description": "{\"enabled\":\"1\",\"dataonly\":\"1\",\"override_url\":null,\"apikey\":\"uk1_IQXRyDSDeLIDLEpclm1NJPNJg400_0H6PDj5iyNd\",\"ignore_tls\":\"0\"}",
+    "appid": "366c6646eedab83cc4b349f198424d2291cbfa76",
+    "appdescription": "It is a self-hosted monitoring tool like \"Uptime Robot\"."
+  },
+  {
+    "title": "Smartglasses Uptime",
+    "colour": "#BDF",
+    "url": "http://gesture-project1.tail539c2b.ts.net:3001/status/smartglasses",
+    "description": "{\"enabled\":\"0\",\"dataonly\":\"1\",\"override_url\":null,\"apikey\":\"uk1_IQXRyDSDeLIDLEpclm1NJPNJg400_0H6PDj5iyNd\",\"ignore_tls\":\"1\"}",
+    "appid": "366c6646eedab83cc4b349f198424d2291cbfa76",
+    "appdescription": null
   },
   {
     "title": "Swagger Docs",
@@ -24,6 +48,14 @@
     "appdescription": null
   },
   {
+    "title": "Portainer",
+    "colour": "#161b1f",
+    "url": "http://gesture-project1.tail539c2b.ts.net:9000",
+    "description": "{\"enabled\":\"1\",\"dataonly\":\"1\",\"override_url\":null,\"username\":\"heimdall\",\"password\":\"heimdall1\",\"ignore_tls\":\"0\"}",
+    "appid": "07b796b3a10eaa8b6f485ed2379187a39400b459",
+    "appdescription": "Portainer is a simple management solution for Docker. Easily manage your Docker hosts and Docker Swarm clusters via Portainer web user interface."
+  },
+  {
     "title": "LakeFS",
     "colour": "#161b1f",
     "url": "http://gesture-project2.tail539c2b.ts.net:8000",
@@ -32,7 +64,7 @@
     "appdescription": null
   },
   {
-    "title": "Minio",
+    "title": "MinIO",
     "colour": "#161b1f",
     "url": "http://gesture-project2.tail539c2b.ts.net:9001/",
     "description": null,
