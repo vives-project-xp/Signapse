@@ -136,9 +136,9 @@ export default function Settings() {
       title: "AI Model",
       content: "Choose your preferred AI version.",
       options: [
-        { label: "ASL-model", value: "ASL", description: "Model die het Amerikaanse gebarentaal ondersteunt.\n dit werkt enkel met het alfabet." },
-        { label: "VGT-model", value: "VGT", description: "Model die het Vlaamse gebarentaal ondersteunt.\n dit werkt enkel met het alfabet." },
-        { label: "LSTM-model", value: "LSTM", description: "Model die het Vlaamse gebarentaal ondersteunt.\n dit werkt enkel met woorden." },
+        { label: "Vlaamse gebarentaal - alfabet", value: "VGT", description: "dit gebruikt het VGT - model.\ndit werkt enkel met het alfabet." },
+        { label: "Amerikaanse gebarentaal - alfabet", value: "ASL", description: "dit gebruikt het ASL - model.\ndit werkt enkel met het alfabet." },
+        { label: "Vlaamse gebarentaal - woorden", value: "LSTM", description: "dit gebruikt het LSTM - model.\ndit werkt enkel met woorden." },
       ],
     },
     {
