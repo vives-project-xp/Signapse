@@ -279,11 +279,11 @@ docker compose up -d
 
 Je services zijn nu (lokaal) bereikbaar:
 
-- LakeFS Web UI: http://localhost:8000/setup
+- LakeFS Web UI: [http://localhost:8000/setup](http://localhost:8000/setup)
 
   - Volg de setup-instructies in de browser om je eerste admin-gebruiker aan te maken.
 
-- Minio Web UI: http://localhost:9001
+- Minio Web UI: [http://localhost:9001](http://localhost:9001)
 
   - Log in met de MINIO_ACCESS_KEY en MINIO_SECRET_KEY uit je .env bestand.
 
@@ -350,7 +350,7 @@ mc mb myminio/<bucket_name>
   
 Met de lakectl client maken we een LakeFS repository die gelinkt is aan de Minio-bucket.
 
-#### Installatie
+#### Installatie (lakectl)
 
 Windows (PowerShell):
 
@@ -413,6 +413,43 @@ Vervang <bucket_name> door de Minio-bucketnaam (bijv. lakefs-storage).
 
 Je bent nu klaar! De services draaien en zijn geconfigureerd.
 
+## Typische Workflow met LakeFS
+
+Nu alles is opgezet, kun je de lakectl client gebruiken om met je data te werken, vergelijkbaar met Git.
+
+Clone een repository lokaal: Dit "mount" de LakeFS-repository als een lokale map, zodat je bestanden kunt zien en bewerken.
+
+```Bash
+
+lakectl local clone lakefs://<repo_name> <local_directory>
+```
+
+Vervang <repo_name> door de naam die je in stap 2b hebt gemaakt.
+
+Vervang <local_directory> door een mapnaam (bijv. ./mijn-data).
+
+Check de status: Nadat je bestanden hebt toegevoegd of gewijzigd in de <local_directory>, kun je de status zien:
+
+```Bash
+# Controleer de status in de lokale directory
+lakectl local status <local_directory>
+
+# Maak een commit met een bericht ( . alle wijzigingen in de directory)
+lakectl local commit . -m "Je commit bericht hier"
+
+# Pull de laatste wijzigingen van de remote repository
+lakectl local pull <local_directory>
+
+# Maak een nieuwe branch
+lakectl branch create lakefs://<repo_name>/<branch_name> --source lakefs://<repo_name>/<source_branch>
+
+# Wissel van branch (binnen een geclonede directory)
+lakectl local checkout <local_directory> --ref lakefs://<repo_name>/<branch_name>
+
+```
+
+Voor meer commando's (zoals commit, push, merge), raadpleeg de LakeFS [documentatie](https://docs.lakefs.io/v1.60/howto/local-checkouts/)
+
 ## De Python Scripts Draaien (Kies je Methode)
 
 Je hebt twee opties om de Python-scripts uit te voeren. Kies er één.
@@ -463,7 +500,7 @@ Gebruik deze methode als je liever binnen de geïsoleerde Docker-omgeving werkt.
 
 #### Jupyter Notebook Interface
 
-Navigeer in je browser naar: http://localhost:8888
+Navigeer in je browser naar: [http://localhost:8888](http://localhost:8888)
 
 Je hebt een token nodig. Vind deze door de logs van de container te bekijken:
 
@@ -478,47 +515,10 @@ docker logs <jupyter_container_name>
 
 Kopieer de token uit de logs (het deel na ?token=...) en plak dit in je browser.
 
-#### Direct scripts uitvoeren (via docker exec) Je kunt ook direct een commando uitvoeren binnen de draaiende Python-container:
+#### Direct scripts uitvoeren (via docker exec) Je kunt ook direct een commando uitvoeren binnen de draaiende Python-container
 
 ```Shell
 docker exec -it <jupyter_container_name> python your_script.py
 ```
 
 (Vervang <jupyter_container_name> en your_script.py.)
-
-## Typische Workflow met LakeFS
-
-Nu alles is opgezet, kun je de lakectl client gebruiken om met je data te werken, vergelijkbaar met Git.
-
-Clone een repository lokaal: Dit "mount" de LakeFS-repository als een lokale map, zodat je bestanden kunt zien en bewerken.
-
-```Bash
-
-lakectl local clone lakefs://<repo_name> <local_directory>
-```
-
-Vervang <repo_name> door de naam die je in stap 2b hebt gemaakt.
-
-Vervang <local_directory> door een mapnaam (bijv. ./mijn-data).
-
-Check de status: Nadat je bestanden hebt toegevoegd of gewijzigd in de <local_directory>, kun je de status zien:
-
-```Bash
-# Controleer de status in de lokale directory
-lakectl local status <local_directory>
-
-# Maak een commit met een bericht ( . alle wijzigingen in de directory)
-lakectl local commit . -m "Je commit bericht hier"
-
-# Pull de laatste wijzigingen van de remote repository
-lakectl local pull <local_directory>
-
-# Maak een nieuwe branch
-lakectl branch create lakefs://<repo_name>/<branch_name> --source lakefs://<repo_name>/<source_branch>
-
-# Wissel van branch (binnen een geclonede directory)
-lakectl local checkout <local_directory> --ref lakefs://<repo_name>/<branch_name>
-
-```
-
-Voor meer commando's (zoals commit, push, merge), raadpleeg de LakeFS [documentatie](https://docs.lakefs.io/v1.60/howto/local-checkouts/)
