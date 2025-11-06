@@ -23,6 +23,14 @@ services:
       test: ["CMD", "wget", "-qO-", "http://localhost:8000/health"]
       interval: 30s
 
+  client:
+    container_name: client
+    build:
+      context: ./client
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+
   heimdall:
     image: linuxserver/heimdall:latest
     container_name: heimdall
