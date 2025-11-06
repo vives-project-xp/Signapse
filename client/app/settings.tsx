@@ -17,14 +17,16 @@ export default function Settings() {
       key: string;
       title: string;
       content?: string;
+      description?: string;
       image?: string;
       link?: string;
-      options?: { label: string; value: string }[];
+      options?: { label: string; value: string; description?: string }[];
       members?: { name: string; image?: string; link?: string }[];
     };
   }) {
     const storageKey = `setting_${item.key}`; // Unique key per setting
     const [selected, setSelected] = useState(item.options?.[0]?.value ?? "");
+    const selectedOption = item.options?.find((o) => o.value === selected);
 
     // Load saved value on mount
     useEffect(() => {
@@ -53,8 +55,10 @@ export default function Settings() {
       }
     };
 
+
+
     return (
-      <View className="mb-3 w-full items-center rounded-xl bg-white p-4 shadow-sm">
+      <View className="mb-3 w-full  rounded-xl bg-white p-4 shadow-sm">
         <Text className="mb-2 text-center text-lg font-semibold text-gray-800">
           {item.title}
         </Text>
@@ -63,13 +67,13 @@ export default function Settings() {
         {item.members ? (
           <View className="mt-3 flex-row flex-wrap justify-center">
             {item.members.map((m) => (
-              <View key={m.name} className="mb-3 mr-3 w-24 items-center">
+              <View key={m.name} className="mb-3 mr-3 w-24 ">
                 {m.image ? (
                   <Image source={{ uri: m.image }} className="mb-2 h-16 w-16 rounded-full" />
                 ) : (
                   <View className="mb-2 h-16 w-16 rounded-full bg-gray-200" />
                 )}
-                <Text className="text-center text-xs text-gray-700">{m.name}</Text>
+                <Text className=" text-xs text-gray-700">{m.name}</Text>
               </View>
             ))}
           </View>
@@ -77,25 +81,35 @@ export default function Settings() {
 
         {/* Content */}
         {item.content ? (
-          <Text className="mt-3 text-center text-sm leading-6 text-gray-600">
+          <Text className="mt-3 text-sm leading-6 text-gray-600">
             {item.content}
           </Text>
         ) : null}
 
         {/* Picker with persistence */}
         {item.options ? (
-          <View className="mt-4 w-full rounded-md border border-gray-200 bg-white">
-            <Picker
-              selectedValue={selected}
-              onValueChange={handleChange}
-              mode="dropdown"
-            >
-              {item.options.map((opt) => (
-                <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
-              ))}
-            </Picker>
+          <View className="mt-4">
+            <View className="rounded-md border border-gray-200 bg-white">
+              <Picker
+                selectedValue={selected}
+                onValueChange={handleChange}
+                mode="dropdown"
+                //style={{ width: 160 }} // optioneel, bepaalt minimumbreedte
+              >
+                {item.options.map((opt) => (
+                  <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+                ))}
+              </Picker>
+            </View>
           </View>
         ) : null}
+
+        {/* Show description of the selected option */}
+          {selectedOption?.description ? (
+            <Text className="mt-2 text-sm text-gray-600">
+              {selectedOption.description}
+            </Text>
+          ) : null}
 
         {/* Link button */}
         {item.link ? (
@@ -104,7 +118,7 @@ export default function Settings() {
             accessibilityRole="link"
             className="mt-4 rounded-md bg-blue-600 px-4 py-2 shadow-sm"
           >
-            <Text className="text-center font-medium text-white">Open link</Text>
+            <Text className="font-medium text-white">Open link</Text>
           </Pressable>
         ) : null}
       </View>
@@ -122,9 +136,9 @@ export default function Settings() {
       title: "AI Model",
       content: "Choose your preferred AI version.",
       options: [
-        { label: "Grok 3 (Free)", value: "grok3" },
-        { label: "Grok 4 (Premium)", value: "grok4" },
-        { label: "Local Model", value: "local" },
+        { label: "ASL-model", value: "ASL", description: "Model die het Amerikaanse gebarentaal ondersteunt.\n dit werkt enkel met het alfabet." },
+        { label: "VGT-model", value: "VGT", description: "Model die het Vlaamse gebarentaal ondersteunt.\n dit werkt enkel met het alfabet." },
+        { label: "LSTM-model", value: "LSTM", description: "Model die het Vlaamse gebarentaal ondersteunt.\n dit werkt enkel met woorden." },
       ],
     },
     {
@@ -141,15 +155,18 @@ export default function Settings() {
   ];
 
   return (
-    <View className="flex-1 bg-gray-100 px-3">
-      <FlatList
-        data={SettingsData}
-        keyExtractor={(item) => item.key}
-        renderItem={({ item }) => <Item item={item} />}
-        className="w-full"
-        contentContainerStyle={{ paddingBottom: 28, paddingTop: 10 }}
-        showsVerticalScrollIndicator={false}
-      />
+    <View className="flex-1 bg-[#F2F2F2]  items-center ">
+      {/* Centrale container met max breedte */}
+      <View className="w-full max-w-[640px]">
+        <FlatList
+          data={SettingsData}
+          keyExtractor={(item) => item.key}
+          renderItem={({ item }) => <Item item={item} />}
+          className="w-full"
+          contentContainerStyle={{ paddingBottom: 28, paddingTop: 10 }}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
     </View>
   );
 }
