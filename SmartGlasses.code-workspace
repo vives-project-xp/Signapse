@@ -34,7 +34,6 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "prettier.endOfLine": "lf",
     "files.eol": "\n",
-    "files.insertFinalNewline": true,
-    "typescript.tsdk": "Client/node_modules/typescript/lib"
+    "files.insertFinalNewline": true
   }
 }
