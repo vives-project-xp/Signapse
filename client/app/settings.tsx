@@ -1,14 +1,15 @@
-import { Picker } from "@react-native-picker/picker"; // npm i @react-native-picker/picker
+import { Picker } from "@react-native-picker/picker";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, Image, Linking, Pressable, Text, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage"; // <-- Add this
 
 export default function Settings() {
   const handleback = () => {
     router.push("/");
   };
 
-  // Item component so each list item can have its own state (picker value)
+  // Item component with persistent storage
   function Item({
     item,
   }: {
@@ -18,17 +19,47 @@ export default function Settings() {
       content?: string;
       image?: string;
       link?: string;
-      options?: { label: string; value: string }[]; // select options
+      options?: { label: string; value: string }[];
       members?: { name: string; image?: string; link?: string }[];
     };
   }) {
+    const storageKey = `setting_${item.key}`; // Unique key per setting
     const [selected, setSelected] = useState(item.options?.[0]?.value ?? "");
+
+    // Load saved value on mount
+    useEffect(() => {
+      const loadValue = async () => {
+        try {
+          const saved = await AsyncStorage.getItem(storageKey);
+          if (saved !== null && item.options?.some(opt => opt.value === saved)) {
+            setSelected(saved);
+          }
+        } catch (error) {
+          console.error("Failed to load setting:", error);
+        }
+      };
+      if (item.options) {
+        loadValue();
+      }
+    }, [storageKey, item.options]);
+
+    // Save value when changed
+    const handleChange = async (value: string) => {
+      setSelected(value);
+      try {
+        await AsyncStorage.setItem(storageKey, value);
+      } catch (error) {
+        console.error("Failed to save setting:", error);
+      }
+    };
 
     return (
       <View className="mb-3 w-full items-center rounded-xl bg-white p-4 shadow-sm">
-        <Text className="mb-2 text-center text-lg font-semibold text-gray-800">{item.title}</Text>
+        <Text className="mb-2 text-center text-lg font-semibold text-gray-800">
+          {item.title}
+        </Text>
 
-        {/* members row */}
+        {/* Members */}
         {item.members ? (
           <View className="mt-3 flex-row flex-wrap justify-center">
             {item.members.map((m) => (
@@ -44,18 +75,19 @@ export default function Settings() {
           </View>
         ) : null}
 
-        {/* content */}
+        {/* Content */}
         {item.content ? (
-          <Text className="mt-3 text-center text-sm leading-6 text-gray-600">{item.content}</Text>
+          <Text className="mt-3 text-center text-sm leading-6 text-gray-600">
+            {item.content}
+          </Text>
         ) : null}
 
-        {/* Picker (select) — wrapped so we can style with Tailwind */}
+        {/* Picker with persistence */}
         {item.options ? (
           <View className="mt-4 w-full rounded-md border border-gray-200 bg-white">
-            {/* Picker itself doesn't accept className reliably, so style wrapper */}
             <Picker
               selectedValue={selected}
-              onValueChange={(v) => setSelected(String(v))}
+              onValueChange={handleChange}
               mode="dropdown"
             >
               {item.options.map((opt) => (
@@ -65,7 +97,7 @@ export default function Settings() {
           </View>
         ) : null}
 
-        {/* link button */}
+        {/* Link button */}
         {item.link ? (
           <Pressable
             onPress={() => item.link && Linking.openURL(item.link)}
@@ -79,60 +111,33 @@ export default function Settings() {
     );
   }
 
-  const SettingsData: {
-    key: string;
-    title: string;
-    content?: string;
-    image?: string;
-    link?: string;
-    options?: { label: string; value: string }[];
-    members?: { name: string; image?: string; link?: string }[];
-  }[] = [
+  const SettingsData = [
     {
       key: "main",
-      title: "page for the settings",
-      content: "here you can change the settings of the app.",
+      title: "App Settings",
+      content: "Configure your preferences below.",
     },
     {
-      key: "OPTIONS1",
-      title: "Settings",
-      content: "content.",
+      key: "AI_VERSION",
+      title: "AI Model",
+      content: "Choose your preferred AI version.",
       options: [
-        { label: "optie 1", value: "optie 1" },
-        { label: "optie 2", value: "optie 2" },
-        { label: "optie 3", value: "optie 3" },
+        { label: "Grok 3 (Free)", value: "grok3" },
+        { label: "Grok 4 (Premium)", value: "grok4" },
+        { label: "Local Model", value: "local" },
       ],
     },
     {
-      key: "OPTIONS2",
-      title: "Settings 1",
-      content: "content.",
+      key: "THEME",
+      title: "Theme",
+      content: "Select light or dark mode.",
       options: [
-        { label: "optie 1", value: "optie 1" },
-        { label: "optie 2", value: "optie 2" },
-        { label: "optie 3", value: "optie 3" },
+        { label: "Light", value: "light" },
+        { label: "Dark", value: "dark" },
+        { label: "System", value: "system" },
       ],
     },
-    {
-      key: "OPTIONS3",
-      title: "Settings 2",
-      content: "content.",
-      options: [
-        { label: "optie 1", value: "optie 1" },
-        { label: "optie 2", value: "optie 2" },
-        { label: "optie 3", value: "optie 3" },
-      ],
-    },
-    {
-      key: "OPTIONS4",
-      title: "Settings 3",
-      content: "content.",
-      options: [
-        { label: "optie 1", value: "optie 1" },
-        { label: "optie 2", value: "optie 2" },
-        { label: "optie 3", value: "optie 3" },
-      ],
-    },
+    
   ];
 
   return (
@@ -142,7 +147,7 @@ export default function Settings() {
         keyExtractor={(item) => item.key}
         renderItem={({ item }) => <Item item={item} />}
         className="w-full"
-        contentContainerStyle={{ paddingBottom: 28, paddingTop: 10}}
+        contentContainerStyle={{ paddingBottom: 28, paddingTop: 10 }}
         showsVerticalScrollIndicator={false}
       />
     </View>
