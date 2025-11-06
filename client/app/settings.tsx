@@ -157,7 +157,7 @@ export default function Settings() {
   return (
     <View className="flex-1 bg-[#F2F2F2]  items-center ">
       {/* Centrale container met max breedte */}
-      <View className="w-full max-w-[640px]">
+      <View className="w-full max-w-[640px] flex-1">
         <FlatList
           data={SettingsData}
           keyExtractor={(item) => item.key}
