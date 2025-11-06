@@ -8,6 +8,8 @@ RUN npm install
 
 COPY . .
 
+RUN npm run export
+
 EXPOSE 3000
 
-CMD ["npm", "run", "web", "--", "--port", "3000"]
+CMD ["npm", "run", "serve", "--", "--port", "3000"]
