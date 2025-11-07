@@ -4,6 +4,14 @@ WORKDIR /app
 
 COPY ./server/requirements.txt .
 
+RUN apt-get update  && \
+    apt-get install -y \
+        curl \
+        libgl1 \
+        libglib2.0-0 \
+        && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN pip install -q -r requirements.txt
 
 COPY ./notebooks/package /package

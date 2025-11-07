@@ -199,3 +199,7 @@ healthchecksdb
 MigrationBackup/
 .vuepress/dist
 .venv/
+# ignored by lakectl local
+notebooks/test/*
+!notebooks/test/.lakefs_ref.yaml
+# End ignored by lakectl local
