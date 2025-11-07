@@ -97,7 +97,7 @@ export default function Settings() {
                 //style={{ width: 160 }} // optioneel, bepaalt minimumbreedte
               >
                 {item.options.map((opt) => (
-                  <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+                  <Picker.Item key={opt.value} label={opt.label} value={opt.value} color={"black"} />
                 ))}
               </Picker>
             </View>
@@ -106,7 +106,7 @@ export default function Settings() {
 
         {/* Show description of the selected option */}
           {selectedOption?.description ? (
-            <Text className="mt-2 text-sm text-gray-600">
+            <Text className="mt-2 text-sm text-gray-600 background-white">
               {selectedOption.description}
             </Text>
           ) : null}

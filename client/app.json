@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSCameraUsageDescription": "This app uses the camera to display what you see through your smart glasses."
-      }
+      },
+      "bundleIdentifier": "com.anonymous.smartglasses"
     },
     "android": {
       "adaptiveIcon": {
@@ -25,7 +26,8 @@
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "CAMERA",
-        "android.permission.CAMERA"
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
       ],
       "package": "com.anonymous.smartglasses"
     },
@@ -54,6 +56,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "9a5cd697-988c-4558-b5cb-ce064980e88c"
+      }
     }
   }
 }
