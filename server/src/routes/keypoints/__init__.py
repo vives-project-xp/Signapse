@@ -11,15 +11,20 @@ router = APIRouter(
     prefix="/keypoints",
     tags=[FastAPITags.KEYPOINTS],
 )
-
+hands = mp_hands.Hands(
+    static_image_mode=True,
+    max_num_hands=2,
+    min_detection_confidence=0.5,
+    min_tracking_confidence=0.5,
+)
 
 @router.post("/", response_model=List[Landmark])
 async def extract_keypoints(
     image: UploadFile = File(...), 
-    static_image_mode: bool = True,
-    max_num_hands: int = 2,
-    min_detection_confidence: float = 0.5,
-    min_tracking_confidence: float = 0.5,
+    # static_image_mode: bool = True,
+    # max_num_hands: int = 2,
+    # min_detection_confidence: float = 0.5,
+    # min_tracking_confidence: float = 0.5,
     ) -> List[Landmark]:
     """
     Accept an image file (multipart/form-data), detect a single hand using MediaPipe,
@@ -31,13 +36,6 @@ async def extract_keypoints(
     data = await image.read()
     if not data:
         raise HTTPException(status_code=400, detail="Empty image file")
-
-    hands = mp_hands.Hands(
-        static_image_mode=static_image_mode,
-        max_num_hands=max_num_hands,
-        min_detection_confidence=min_detection_confidence,
-        min_tracking_confidence=min_tracking_confidence,
-    )
 
     # convert to numpy image
     nparr = np.frombuffer(data, np.uint8)
