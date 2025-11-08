@@ -119,7 +119,7 @@ useEffect(() => {
         keypointsResp = await api.keypointsFromImage(photo.uri);
       }
 
-      const kp = keypointsResp?.landmarks ?? [];
+      const kp = keypointsResp ?? [];
       setLandmarks(kp);
 
       if (kp.length === 21) {
