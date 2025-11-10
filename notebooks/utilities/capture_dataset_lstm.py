@@ -75,6 +75,7 @@ dotenv.load_dotenv()
 DATA_PATH = os.getenv("LAKEFS_DATA_PATH")  # Path to store data
 action = get_gesture_name() # Get gesture name to make directory
 no_sequences_to_record = 30  # Number of sequences to record
+timestamp = str(int(time.time()))  # Current timestamp for uniqueness
 
 # Create directories for storing data
 def create_gesture_directory():
@@ -109,7 +110,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.5,
     for seq in range(start_sequence, start_sequence + no_sequences_to_record):
 
         # Create sequence directory
-        seq_dir = os.path.join(gesture_dir, str(seq))
+        seq_dir = os.path.join(gesture_dir, str(seq), timestamp)
         os.makedirs(seq_dir, exist_ok=True)
         print(f"Get ready for sequence {seq}.")
 
@@ -194,11 +195,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.5,
             # Save the image and keypoints
             cv2.imwrite(image_path, image)
             np.save(keypoints_path, keypoints)
-        
-            print(f"Sequence {seq} saved.")
 
-        else: 
-            print(f"Sequence {seq} has no frames recorded, skipping save.")
 
 print("Data collection complete.")
 # Release the webcam and close windows

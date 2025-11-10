@@ -4,7 +4,7 @@ from typing import Dict
 
 # Configurable paths
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(THIS_DIR, "test")
+DATA_DIR = os.path.join(THIS_DIR, "data")  # Directory where gesture data is stored, change this if needed
 
 # Create a mapping from gesture names to integer labels
 def create_gesture_map(data_path: str) -> Dict[str, int]:
