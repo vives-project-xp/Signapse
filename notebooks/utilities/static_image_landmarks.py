@@ -13,7 +13,7 @@ hands = mp_hands.Hands(
     )
 
 # List of image files to process
-IMAGE_FILES = ['./images/test.jpg']
+IMAGE_FILES = ['./images/Poster.png']
 
 # Add padding to the bottom of the image
 def pad_bottom(image, pad):
