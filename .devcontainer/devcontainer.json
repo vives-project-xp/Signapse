@@ -40,5 +40,11 @@
     }
   },
 
+  "remoteEnv": {
+    // Set UV_CACHE_DIR to a location inside the devcontainer to persist the cache
+    // and allow for hard linking of cached files. (just makes it faster)
+    "UV_CACHE_DIR": "/workspaces/SmartGlasses/.uv-cache"
+  },
+
   "remoteUser": "root"
 }
