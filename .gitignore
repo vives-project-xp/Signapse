@@ -5,6 +5,10 @@ temp/
 .env
 notebooks/data
 
+.uv-cache/
+
+.idea/
+
 # Visual Studio en andere standaard ignores
 *.rsuser
 *.suo
