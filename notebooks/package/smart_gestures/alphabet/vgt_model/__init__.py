@@ -9,6 +9,7 @@ from .data_utils import (
     normalize_landmarks,
 )
 from .model_utils import (
+    VGTModel,
     create_model,
     load_model,
     DEVICE,
@@ -23,6 +24,7 @@ __all__ = [
     "get_classes",
     "get_loaders",
     "normalize_landmarks",
+    "VGTModel",
     "create_model",
     "load_model",
     "DEVICE",
