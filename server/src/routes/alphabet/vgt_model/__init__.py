@@ -4,11 +4,11 @@ from const import FastAPITags
 
 from schemas import ClassesResponse, PredictBody, PredictResponse
 
-from smart_gestures.alphabet.vgt_model import get_classes, VGTModel
+from smart_gestures.alphabet.vgt_model import get_classes, VGT
 
 classes = get_classes()
 
-model = VGTModel()
+model = VGT()
 
 router = APIRouter(
     prefix="/vgt",

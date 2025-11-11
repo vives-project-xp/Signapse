@@ -3,32 +3,18 @@
 This package contains code and models for the VGT-based gesture recognition.
 """
 
-from .data_utils import (
+from .data import (
     get_classes,
     get_loaders,
-    normalize_landmarks,
+    _normalize_landmarks,
 )
-from .model_utils import (
-    VGTModel,
-    create_model,
-    load_model,
-    DEVICE,
-    MODEL_DIR,
-)
-from .train_utils import (
-    train_model,
-    evaluate_model,
+from .model import (
+    VGTModel as VGT
 )
 
 __all__ = [
     "get_classes",
     "get_loaders",
-    "normalize_landmarks",
-    "VGTModel",
-    "create_model",
-    "load_model",
-    "DEVICE",
-    "MODEL_DIR",
-    "train_model",
-    "evaluate_model", 
+    "_normalize_landmarks",
+    "VGT"
 ]
