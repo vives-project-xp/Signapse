@@ -13,12 +13,12 @@
       "path": "./client"
     },
     {
-      "name": "Docs",
-      "path": "./docs"
+      "name": "Model Training",
+      "path": "./notebooks"
     },
     {
-      "name": "Notebooks",
-      "path": "./notebooks"
+      "name": "Docs",
+      "path": "./docs"
     }
   ],
   "settings": {
