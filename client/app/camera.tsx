@@ -1,4 +1,5 @@
 import { Button } from "@/components/Button";
+import { LandmarksOverlay } from "@/components/LandmarksOverlay";
 import api, { HttpError } from "@/lib/api";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import { router } from "expo-router";
@@ -6,22 +7,25 @@ import { useEffect, useRef, useState } from "react";
 import { Platform, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const CAPTURE_INTERVAL = 700;
+const CAPTURE_INTERVAL = 500;
 
 export default function CameraScreen() {
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
   const [showTranslation, setShowTranslation] = useState(false);
+  const [showLandmarks, setShowLandmarks] = useState(false);
   const [prediction, setPrediction] = useState<string>("");
   const [classes, setClasses] = useState<string[]>([]);
+  const [landmarks, setLandmarks] = useState<{ x: number; y: number; z: number }[]>([]);
 
   const cameraRef = useRef<CameraView>(null);
 
   // Request permission and load classes on mount
   useEffect(() => {
     if (!permission?.granted) requestPermission();
-    
-    api.classes("vgt")
+
+    api
+      .classes("vgt")
       .then((resp) => setClasses(resp.classes || []))
       .catch(console.warn);
   }, [permission, requestPermission]);
@@ -32,11 +36,12 @@ export default function CameraScreen() {
 
     try {
       const cam = cameraRef.current as any;
-      const photo = await cam.takePictureAsync?.({
-        quality: 0.4,
-        skipProcessing: true,
-        base64: false,
-      }) ?? await cam.takePhoto?.({ qualityPrioritization: "speed" });
+      const photo =
+        (await cam.takePictureAsync?.({
+          quality: 0.4,
+          skipProcessing: true,
+          base64: false,
+        })) ?? (await cam.takePhoto?.({ qualityPrioritization: "speed" }));
 
       if (!photo?.uri) return;
 
@@ -49,16 +54,20 @@ export default function CameraScreen() {
       }
 
       // Get landmarks and predict
-      const { landmarks } = await api.keypointsFromImage(imageData);
-      
-      if (landmarks.length === 21) {
-        const result = await api.predict("vgt", landmarks);
+      const { landmarks: detectedLandmarks } = await api.keypointsFromImage(imageData);
+
+      if (detectedLandmarks.length === 21) {
+        setLandmarks(detectedLandmarks);
+        const result = await api.predict("vgt", detectedLandmarks);
         const index = Number(result?.prediction);
         setPrediction(!isNaN(index) && classes[index] ? classes[index] : result?.prediction || "");
+      } else {
+        setLandmarks([]);
       }
     } catch (error) {
       if (error instanceof HttpError && error.statusCode === 404) {
         setPrediction(""); // No hand detected
+        setLandmarks([]);
       }
     }
   };
@@ -92,6 +101,7 @@ export default function CameraScreen() {
   return (
     <View className="flex-1 bg-[#F2F2F2]">
       <CameraView ref={cameraRef} facing={facing} style={{ flex: 1 }} />
+      <LandmarksOverlay landmarks={landmarks} visible={showLandmarks} />
 
       <SafeAreaView
         pointerEvents="box-none"
@@ -121,6 +131,14 @@ export default function CameraScreen() {
                 className="h-12 flex-1 rounded-lg border-2 border-[#B1B1B1] bg-white sm:h-14 md:h-16"
                 labelClasses="text-black text-base sm:text-lg md:text-xl font-semibold"
                 onPress={() => setShowTranslation((v) => !v)}
+                size="lg"
+                variant="secondary"
+              />
+              <Button
+                label={`Landmarks (${showLandmarks ? "On" : "Off"})`}
+                className="h-12 flex-1 rounded-lg border-2 border-[#B1B1B1] bg-white sm:h-14 md:h-16"
+                labelClasses="text-black text-base sm:text-lg md:text-xl font-semibold"
+                onPress={() => setShowLandmarks((v) => !v)}
                 size="lg"
                 variant="secondary"
               />
