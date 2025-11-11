@@ -5,7 +5,8 @@ import numpy as np
 import cv2 as cv
 from mediapipe.python.solutions import hands as mp_hands
 
-from const import FastAPITags, Landmark, NUM_POINTS
+from const import FastAPITags, Landmark
+from schemas import KeypointsResponse
 
 router = APIRouter(
     prefix="/keypoints",
@@ -18,14 +19,14 @@ hands = mp_hands.Hands(
     min_tracking_confidence=0.5,
 )
 
-@router.post("/", response_model=List[Landmark])
+@router.post("/")
 async def extract_keypoints(
-    image: UploadFile = File(...), 
+    image: UploadFile = File(...),
     # static_image_mode: bool = True,
     # max_num_hands: int = 2,
     # min_detection_confidence: float = 0.5,
     # min_tracking_confidence: float = 0.5,
-    ) -> List[Landmark]:
+) -> KeypointsResponse:
     """
     Accept an image file (multipart/form-data), detect a single hand using MediaPipe,
     and return the list of 21 landmarks as normalized (x, y, z) floats.
@@ -40,6 +41,10 @@ async def extract_keypoints(
     # convert to numpy image
     nparr = np.frombuffer(data, np.uint8)
     img = cv.imdecode(nparr, cv.IMREAD_COLOR)
+    
+    # check if image decoding was successful
+    if img is None:
+        raise HTTPException(status_code=400, detail="Invalid image file or unsupported format")
 
     # convert BGR to RGB for mediapipe
     img_rgb = cv.cvtColor(img, cv.COLOR_BGR2RGB)
@@ -49,7 +54,7 @@ async def extract_keypoints(
 
     if not results or not results.multi_hand_landmarks:  # type: ignore
         # no hand detected: return empty list (client can decide what to do)
-        return []
+        raise HTTPException(status_code=404, detail="No hand detected")
 
     hand_landmarks = results.multi_hand_landmarks[0]  # type: ignore
     landmarks: List[Landmark] = []
@@ -58,12 +63,7 @@ async def extract_keypoints(
         landmarks.append(Landmark(x=float(lm.x), y=float(
             lm.y), z=float(lm.z)))  # type: ignore
 
-    # Sanity: enforce expected number of points (21)
-    if len(landmarks) != NUM_POINTS:
-        # still return whatever we have but note in logs could be added
-        return landmarks
-
-    return landmarks
+    return KeypointsResponse(landmarks=landmarks)
 
 
 __all__ = [
