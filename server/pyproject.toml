@@ -5,12 +5,50 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "black~=25.9.0",
     "fastapi[standard]~=0.119.0",
+    "flake8~=7.3.0",
+    "flake8-pyproject~=1.2.3",
+    "isort~=7.0.0",
     "mediapipe>=0.10.14",
+    "mypy~=1.18.2",
     "numpy~=2.3.4",
     "opencv-python>=4.11.0.86",
     "pandas~=2.3.3",
+    "pre-commit~=4.3.0",
     "torch~=2.9.0",
     "tqdm>=4.67.1",
     "typing-extensions~=4.15.0",
 ]
+
+
+[tool.black]
+line-length = 120
+target-version = ['py312']
+exclude = '''
+/(
+  \.
+  | build
+  | dist
+  | migrations
+  | __pycache__
+)
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 120
+known_first_party = ["src"]
+default_section = "THIRDPARTY"
+
+[tool.mypy]
+python_version = "3.12"
+warn_unused_configs = true
+ignore_missing_imports = true
+strict = false
+
+[tool.flake8]
+# E203: Whitespace before ':' (Black's formatting)
+# E501: Line too long (Black's formatting)
+extend-ignore = ["E203", "E501"]
+exclude = [".git", "__pycache__", "build", "dist"]
