@@ -1,16 +1,17 @@
 import torch.optim as optim
 import torch.nn as nn
 import torch
-from typing import Optional, Dict, Tuple, Any
+from typing import Optional, Tuple, Any
 from tqdm import tqdm
 from torch.utils.data import DataLoader
+from smart_gestures.alphabet.vgt_model import DEVICE
 from .callbacks import create_scheduler, EarlyStopping, ModelCheckpoint
-from .model_utils import DEVICE
+
 
 def train_model(
     model: torch.nn.Module,
     train_loader: DataLoader[Any],
-    val_loader: DataLoader[Any] | None= None,
+    val_loader: DataLoader[Any] | None = None,
     epochs: int = 50,
     lr: float = 1e-3,
     scheduler_type: Optional[str] = None,
@@ -18,7 +19,7 @@ def train_model(
     early_stopping_kwargs: Optional[dict[str, Any]] = None,
     checkpoint_kwargs: Optional[dict[str, Any]] = None,
     verbose: bool = True,
-)-> None:
+) -> None:
     """
     Train the given model using the provided DataLoader(s), with optional callbacks.
 
@@ -64,7 +65,8 @@ def train_model(
 
             running_loss += loss.item() * inputs.size(0)
 
-        train_epoch_loss = running_loss / len(train_loader.dataset)
+        train_epoch_loss = running_loss / \
+            len(train_loader.dataset)  # type: ignore
 
         # Validation pass
         val_loss, val_acc = None, None
@@ -76,14 +78,15 @@ def train_model(
             if scheduler_type == "plateau":
                 # Needs a metric to step on; prefer val_loss if available
                 metric = val_loss if val_loss is not None else train_epoch_loss
-                scheduler.step(metric)
+                scheduler.step(metric)  # type: ignore
             else:
-                scheduler.step()
+                scheduler.step()  # type: ignore
 
         # Early stopping on monitored metric (default val_loss if available, else train loss)
         if early_stopper is not None:
             monitor_value = val_loss if (val_loss is not None and early_stopper.mode == "min") else (
-                val_acc if (val_acc is not None and early_stopper.mode == "max") else train_epoch_loss
+                val_acc if (val_acc is not None and early_stopper.mode ==
+                            "max") else train_epoch_loss
             )
             stop = early_stopper.step(monitor_value, model=model)
             if stop and verbose:
@@ -93,9 +96,11 @@ def train_model(
         if checkpoint is not None:
             # Choose metric consistent with checkpoint.mode
             metric_value = val_loss if (checkpoint.mode == "min" and val_loss is not None) else (
-                val_acc if (checkpoint.mode == "max" and val_acc is not None) else train_epoch_loss
+                val_acc if (checkpoint.mode ==
+                            "max" and val_acc is not None) else train_epoch_loss
             )
-            wrote = checkpoint.save(epoch=epoch+1, model=model, optimizer=optimizer, metric_value=metric_value)
+            wrote = checkpoint.save(
+                epoch=epoch+1, model=model, optimizer=optimizer, metric_value=metric_value)
             if wrote and verbose:
                 print(f"Saved checkpoint to {checkpoint.filepath}")
 
@@ -105,11 +110,13 @@ def train_model(
                     f"Epoch {epoch+1}/{epochs} | Train Loss: {train_epoch_loss:.4f} | Val Loss: {val_loss:.4f} | Val Acc: {val_acc:.2f}%"
                 )
             else:
-                print(f"Epoch {epoch+1}/{epochs} | Train Loss: {train_epoch_loss:.4f}")
+                print(
+                    f"Epoch {epoch+1}/{epochs} | Train Loss: {train_epoch_loss:.4f}")
 
         # Respect early stopping decision
         if early_stopper is not None and early_stopper.should_stop:
             break
+
 
 def evaluate_model(model: nn.Module, dataloader: DataLoader[dict[str, Any]]) -> float:
     """

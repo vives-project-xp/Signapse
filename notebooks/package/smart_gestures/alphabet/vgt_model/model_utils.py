@@ -5,13 +5,16 @@ import torch
 import torch.nn as nn
 
 from .const import IN_DIM, NUM_POINTS
-from .data_utils import get_classes, normalize_landmarks
+from .data_utils import get_classes, _normalize_landmarks
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 THIS_DIR = Path(__file__).parent
 MODEL_DIR = THIS_DIR / "models"
 MODEL_FILE = MODEL_DIR / "vgt_model.pth"
 _CLASSES = get_classes()
+
+if not MODEL_FILE.exists():
+    raise FileNotFoundError(f"Model file not found: {MODEL_FILE}")
 
 
 def create_model(num_classes: int, in_dim: int):
@@ -54,17 +57,15 @@ def load_model(model: nn.Module, path: str = str(MODEL_FILE)) -> nn.Module:
     """
     Load the model state dictionary from a file.
     """
-    model = create_model(model.num_classes, model.in_dim)
+    model = create_model(model.num_classes, model.in_dim)  # type: ignore
     model.load_state_dict(torch.load(path, map_location=DEVICE))
     return model
 
 
-class VGTModel(nn.Module):
+class VGTModel():
     classes: list[str]
 
     def __init__(self, classes: list[str] = (_CLASSES), in_dim: int = IN_DIM):
-        super(VGTModel, self).__init__()
-
         self.classes = classes
         self.in_dim = in_dim
 
@@ -78,7 +79,7 @@ class VGTModel(nn.Module):
         self.model.eval()
 
     def _prepare_input(self, landmarks: list[dict[str, float]]) -> np.ndarray:
-        arr = normalize_landmarks(
+        arr = _normalize_landmarks(
             landmarks, root_idx=0, scale_method="wrist_to_middle")
         return arr.reshape(-1)
 

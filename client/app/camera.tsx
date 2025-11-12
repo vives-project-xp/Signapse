@@ -101,7 +101,11 @@ export default function CameraScreen() {
   return (
     <View className="flex-1 bg-[#F2F2F2]">
       <CameraView ref={cameraRef} facing={facing} style={{ flex: 1 }} />
-      <LandmarksOverlay landmarks={landmarks} visible={showLandmarks} />
+      <LandmarksOverlay
+        landmarks={landmarks}
+        visible={showLandmarks}
+        mirrored={facing === "back"}
+      />
 
       <SafeAreaView
         pointerEvents="box-none"

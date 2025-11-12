@@ -1,0 +1,2 @@
+IN_DIM = 63
+NUM_POINTS = 21
