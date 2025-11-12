@@ -7,14 +7,13 @@ import { useEffect, useRef, useState } from "react";
 import { Platform, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const CAPTURE_INTERVAL = 500;
+const CAPTURE_INTERVAL = 250;
 
 export default function CameraScreen() {
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
-  const [showTranslation, setShowTranslation] = useState(false);
   const [showLandmarks, setShowLandmarks] = useState(false);
-  const [prediction, setPrediction] = useState<string>("");
+  const [prediction, setPrediction] = useState<string | null>(null);
   const [classes, setClasses] = useState<string[]>([]);
   const [landmarks, setLandmarks] = useState<{ x: number; y: number; z: number }[]>([]);
 
@@ -28,25 +27,26 @@ export default function CameraScreen() {
       .classes("vgt")
       .then((resp) => setClasses(resp.classes || []))
       .catch(console.warn);
-  }, [permission, requestPermission]);
+  }, [permission?.granted, requestPermission]);
 
   // Capture and process images
   const capture = async () => {
     if (!cameraRef.current || !permission?.granted) return;
 
     try {
-      const cam = cameraRef.current as any;
+      const cam = cameraRef.current;
       const photo =
         (await cam.takePictureAsync?.({
           quality: 0.4,
           skipProcessing: true,
           base64: false,
-        })) ?? (await cam.takePhoto?.({ qualityPrioritization: "speed" }));
+          shutterSound: false,
+        })) ?? (await (cam as any).takePhoto?.({ qualityPrioritization: "speed" }));
 
-      if (!photo?.uri) return;
+      if (!photo?.uri) throw new Error("Failed to capture photo");
 
       // Prepare image based on platform
-      let imageData = photo.uri;
+      let imageData: string | File = photo.uri;
       if (Platform.OS === "web") {
         const response = await fetch(photo.uri);
         const blob = await response.blob();
@@ -60,14 +60,21 @@ export default function CameraScreen() {
         setLandmarks(detectedLandmarks);
         const result = await api.predict("vgt", detectedLandmarks);
         const index = Number(result?.prediction);
-        setPrediction(!isNaN(index) && classes[index] ? classes[index] : result?.prediction || "");
+        setPrediction(
+          !isNaN(index) && classes[index] ? classes[index] : result?.prediction || null
+        );
       } else {
         setLandmarks([]);
       }
     } catch (error) {
       if (error instanceof HttpError && error.statusCode === 404) {
-        setPrediction(""); // No hand detected
+        setPrediction(null); // No hand detected
         setLandmarks([]);
+      } else
+      if (error instanceof Error && error.message === "Failed to capture photo") {
+        // Ignore capture errors
+      } else {
+        console.warn("Capture error:", error);
       }
     }
   };
@@ -82,13 +89,17 @@ export default function CameraScreen() {
   }, [permission?.granted, classes]);
 
   if (!permission) {
-    return <Text>Loading camera...</Text>;
+    return (
+      <View className="flex-1 items-center justify-center p-6">
+        <Text className="mb-4 text-center">Loading camera...</Text>
+      </View>
+    );
   }
 
-  if (!permission.granted) {
+  if (!permission || !permission.granted) {
     return (
-      <View className="flex-1 items-center justify-center bg-black p-6">
-        <Text className="mb-4 text-center text-white">Camera permission is required</Text>
+      <View className="flex-1 items-center justify-center p-6">
+        <Text className="mb-4 text-center">Camera permission is required</Text>
         <Button onPress={requestPermission} label="Grant permission" />
       </View>
     );
@@ -112,13 +123,11 @@ export default function CameraScreen() {
         className="absolute inset-x-0 bottom-4 px-4 sm:bottom-6 sm:px-6 md:bottom-8 md:px-8"
       >
         <View className="w-full px-4 sm:px-6 md:px-8">
-          {showTranslation && (
-            <View className="mb-3 h-56 w-full max-w-2xl items-center justify-center self-center rounded-xl border border-[#B1B1B1] bg-white px-4 md:h-64 lg:h-72">
-              <Text className="text-center text-xl font-semibold text-black md:text-2xl">
-                {prediction || "—"}
-              </Text>
-            </View>
-          )}
+          <View className="mb-3 h-56 w-full max-w-2xl items-center justify-center self-center rounded-xl border border-[#B1B1B1] bg-white px-4 md:h-64 lg:h-72">
+            <Text className="text-center text-xl font-semibold text-black md:text-2xl">
+              {prediction || "—"}
+            </Text>
+          </View>
 
           <View className="w-full max-w-2xl self-center">
             <View className="flex-row items-center justify-between gap-2 md:gap-3">
@@ -127,14 +136,6 @@ export default function CameraScreen() {
                 className="h-12 flex-1 rounded-lg border-2 border-[#B1B1B1] bg-white sm:h-14 md:h-16"
                 labelClasses="text-black text-base sm:text-lg md:text-xl font-semibold"
                 onPress={() => router.back()}
-                size="lg"
-                variant="secondary"
-              />
-              <Button
-                label="Text"
-                className="h-12 flex-1 rounded-lg border-2 border-[#B1B1B1] bg-white sm:h-14 md:h-16"
-                labelClasses="text-black text-base sm:text-lg md:text-xl font-semibold"
-                onPress={() => setShowTranslation((v) => !v)}
                 size="lg"
                 variant="secondary"
               />
