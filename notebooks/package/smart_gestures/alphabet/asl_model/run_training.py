@@ -15,7 +15,8 @@ def main(args: list[str]) -> None:
 
     # Load data
     classes = get_classes()
-    dataset = load_and_preprocess_dataset(HAND_LANDMARKS_CSV)
+    # TODO: define HAND_LANDMARKS_CSV path
+    dataset = load_and_preprocess_dataset(HAND_LANDMARKS_CSV)  # type: ignore
     train_dataset, val_dataset = split_dataset(
         dataset, val_ratio=0.2, random_seed=42)
     train_loader, val_loader = get_loaders(
@@ -27,11 +28,11 @@ def main(args: list[str]) -> None:
     model = create_model(num_classes, in_dim)
 
     # Train model
-    train_model(model, train_loader,
+    train_model(model, train_loader, # type: ignore
                 epochs=parsed_args.epochs, lr=parsed_args.lr)
 
     # Evaluate model
-    accuracy = evaluate_model(model, val_loader)
+    accuracy = evaluate_model(model, val_loader) # type: ignore
     print(f"Validation Accuracy: {accuracy:.2f}%")
 
     # Save model

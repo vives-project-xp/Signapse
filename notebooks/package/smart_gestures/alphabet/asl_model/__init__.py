@@ -8,6 +8,7 @@ from .data_utils import (
     get_loaders,
 )
 from .model_utils import (
+    ASLModel,
     create_model,
     load_model,
     DEVICE,
@@ -20,9 +21,10 @@ from .train_utils import (
 __all__ = [
     "get_classes",
     "get_loaders",
+    "ASLModel",
     "create_model",
     "load_model",
     "DEVICE",
     "train_model",
-    "evaluate_model", 
+    "evaluate_model",
 ]

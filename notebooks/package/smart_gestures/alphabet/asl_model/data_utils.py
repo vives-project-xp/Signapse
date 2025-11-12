@@ -1,13 +1,17 @@
+import json
 import os
+from pathlib import Path
 from typing import cast, Callable
 import pandas as pd
 import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader, random_split
 
-THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(THIS_DIR, "images")
-HAND_LANDMARKS_CSV = os.path.join(DATA_DIR, "hand_landmarks.csv")
+THIS_DIR = Path(__file__).parent
+CLASSES_FILE = THIS_DIR / "data" / "classes.json"
+
+if not CLASSES_FILE.exists():
+    raise FileNotFoundError(f"Classes file not found: {CLASSES_FILE}")
 
 
 class LandmarksDataset(Dataset[tuple[np.ndarray, int]]):
@@ -43,7 +47,7 @@ def load_and_preprocess_dataset(csv_file: str) -> LandmarksDataset:
     """
     df = pd.read_csv(csv_file)
     df['class'] = df['class'].astype('category')
-    X = np.array(df['landmarks'].apply(preprocess).tolist())
+    X = np.array(df['landmarks'].apply(preprocess).tolist())  # type: ignore
     y = np.array(df['class'].cat.codes, dtype=np.int64)
     classes = df['class'].cat.categories.tolist()
     return LandmarksDataset(X, y, classes, preprocess=None)
@@ -52,7 +56,35 @@ def load_and_preprocess_dataset(csv_file: str) -> LandmarksDataset:
 
 
 def get_classes() -> list[str]:
-    return (pd.read_csv(HAND_LANDMARKS_CSV)['class'].astype('category').cat.categories.tolist())
+    return json.load(open(CLASSES_FILE, 'r', encoding='utf-8'))
+
+
+def normalize_landmarks(lm, root_idx=0, scale_method="wrist_to_middle") -> np.ndarray:
+    """
+    Normalize a single sample of landmarks.
+    - translate so the root (wrist) is at the origin
+    - scale by a hand-size measure
+    Returns an array of shape (21,3)
+    """
+    arr = np.array([[p.get('x', 0.0), p.get('y', 0.0), p.get('z', 0.0)]
+                   for p in lm], dtype=np.float32)
+    if arr.shape[0] != 21:
+        raise ValueError(
+            f"Expected 21 landmarks per sample, got {arr.shape[0]}")
+    root = arr[root_idx].copy()
+    arr = arr - root
+
+    if scale_method == "wrist_to_middle":
+        # Mediapipe middle-finger MCP is index 9
+        scale = np.linalg.norm(arr[9])
+    else:
+        dists = np.linalg.norm(arr[:, None, :] - arr[None, :, :], axis=-1)
+        scale = dists.max()
+
+    if scale <= 1e-6:
+        scale = 1.0
+    arr = arr / scale
+    return arr
 
 # Split dataset into training and validation sets 80/20
 
