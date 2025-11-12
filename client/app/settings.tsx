@@ -1,13 +1,21 @@
 import { Picker } from "@react-native-picker/picker";
-import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { FlatList, Image, Linking, Pressable, Text, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // <-- Add this
+import { BASE_URL } from "@/lib/const";
+import api from "@/lib/api";
 
 export default function Settings() {
-  const handleback = () => {
-    router.push("/");
-  };
+  const [apiVersion, setApiVersion] = useState("-");
+
+  useEffect(() => {
+    // Fetch API version from the backend
+    async function getAPIVersion() {
+      const data = await api.health();
+      setApiVersion(data.version);
+    }
+    getAPIVersion();
+  }, []);
 
   // Item component with persistent storage
   function Item({
@@ -33,7 +41,7 @@ export default function Settings() {
       const loadValue = async () => {
         try {
           const saved = await AsyncStorage.getItem(storageKey);
-          if (saved !== null && item.options?.some(opt => opt.value === saved)) {
+          if (saved !== null && item.options?.some((opt) => opt.value === saved)) {
             setSelected(saved);
           }
         } catch (error) {
@@ -55,13 +63,9 @@ export default function Settings() {
       }
     };
 
-
-
     return (
       <View className="mb-3 w-full  rounded-xl bg-white p-4 shadow-sm">
-        <Text className="mb-2 text-center text-lg font-semibold text-gray-800">
-          {item.title}
-        </Text>
+        <Text className="mb-2 text-center text-lg font-semibold text-gray-800">{item.title}</Text>
 
         {/* Members */}
         {item.members ? (
@@ -81,9 +85,7 @@ export default function Settings() {
 
         {/* Content */}
         {item.content ? (
-          <Text className="mt-3 text-sm leading-6 text-gray-600">
-            {item.content}
-          </Text>
+          <Text className="mt-3 text-sm leading-6 text-gray-600">{item.content}</Text>
         ) : null}
 
         {/* Picker with persistence */}
@@ -97,7 +99,12 @@ export default function Settings() {
                 //style={{ width: 160 }} // optioneel, bepaalt minimumbreedte
               >
                 {item.options.map((opt) => (
-                  <Picker.Item key={opt.value} label={opt.label} value={opt.value} color={"black"} />
+                  <Picker.Item
+                    key={opt.value}
+                    label={opt.label}
+                    value={opt.value}
+                    color={"black"}
+                  />
                 ))}
               </Picker>
             </View>
@@ -105,11 +112,11 @@ export default function Settings() {
         ) : null}
 
         {/* Show description of the selected option */}
-          {selectedOption?.description ? (
-            <Text className="mt-2 text-sm text-gray-600 background-white">
-              {selectedOption.description}
-            </Text>
-          ) : null}
+        {selectedOption?.description ? (
+          <Text className="background-white mt-2 text-sm text-gray-600">
+            {selectedOption.description}
+          </Text>
+        ) : null}
 
         {/* Link button */}
         {item.link ? (
@@ -136,9 +143,21 @@ export default function Settings() {
       title: "AI Model",
       content: "Choose your preferred AI version.",
       options: [
-        { label: "Vlaamse gebarentaal - alfabet", value: "VGT", description: "dit gebruikt het VGT - model.\ndit werkt enkel met het alfabet." },
-        { label: "Amerikaanse gebarentaal - alfabet", value: "ASL", description: "dit gebruikt het ASL - model.\ndit werkt enkel met het alfabet." },
-        { label: "Vlaamse gebarentaal - woorden", value: "LSTM", description: "dit gebruikt het LSTM - model.\ndit werkt enkel met woorden." },
+        {
+          label: "Vlaamse gebarentaal - alfabet",
+          value: "VGT",
+          description: "dit gebruikt het VGT - model.\ndit werkt enkel met het alfabet.",
+        },
+        {
+          label: "Amerikaanse gebarentaal - alfabet",
+          value: "ASL",
+          description: "dit gebruikt het ASL - model.\ndit werkt enkel met het alfabet.",
+        },
+        {
+          label: "Vlaamse gebarentaal - woorden",
+          value: "LSTM",
+          description: "dit gebruikt het LSTM - model.\ndit werkt enkel met woorden.",
+        },
       ],
     },
     {
@@ -151,11 +170,15 @@ export default function Settings() {
         { label: "System", value: "system" },
       ],
     },
-    
+    {
+      key: "apistuff",
+      title: "API URL",
+      content: `URL: ${BASE_URL}\nBackend version: v${apiVersion}`,
+    },
   ];
 
   return (
-    <View className="flex-1 bg-[#F2F2F2]  items-center ">
+    <View className="flex-1 items-center  bg-[#F2F2F2] ">
       {/* Centrale container met max breedte */}
       <View className="w-full max-w-[640px] flex-1">
         <FlatList
