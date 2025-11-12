@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { Platform, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const CAPTURE_INTERVAL = 500;
+const CAPTURE_INTERVAL = 1000;
 
 export default function CameraScreen() {
   const [facing, setFacing] = useState<CameraType>("back");
@@ -111,6 +111,7 @@ export default function CameraScreen() {
       <View className="flex-1 items-center justify-center p-6">
         <Text className="mb-4 text-center">Camera permission is required</Text>
         <Button onPress={requestPermission} label="Grant permission" />
+        <Button onPress={() => router.push("/")} label="Back" />
       </View>
     );
   }
@@ -145,7 +146,7 @@ export default function CameraScreen() {
                 label="Back"
                 className="h-12 flex-1 rounded-lg border-2 border-[#B1B1B1] bg-white sm:h-14 md:h-16"
                 labelClasses="text-black text-base sm:text-lg md:text-xl font-semibold"
-                onPress={() => router.back()}
+                onPress={() => router.push("/")}
                 size="lg"
                 variant="secondary"
               />
