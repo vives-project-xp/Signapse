@@ -1,9 +1,4 @@
-import Constants from "expo-constants";
-
-const BASE_URL =
-  (Constants?.expoConfig?.extra as any)?.EXPO_PUBLIC_API_URL ||
-  process.env.EXPO_PUBLIC_API_URL ||
-  "http://127.0.0.1:8000/";
+import { BASE_URL } from "@/lib/const";
 
 // Custom error classes for better error handling
 export class ApiError extends Error {
@@ -203,16 +198,17 @@ const api = {
    * @throws {HttpError} If server returns error status
    * @throws {ParseError} If response cannot be parsed
    */
-  keypointsFromImage: (image: string | Blob | File) => {
+  keypointsFromImage: async (image: string | Blob | File) => {
     const form = new FormData();
 
     if (typeof image === "string") {
-      // React Native style file object
+      // React Native (iOS/Android): Use the URI format that React Native expects
+      // @ts-ignore - React Native's FormData accepts this format
       form.append("image", {
         uri: image,
         name: "frame.jpg",
         type: "image/jpeg",
-      } as any);
+      });
     } else {
       // Web: append actual File/Blob
       const file =

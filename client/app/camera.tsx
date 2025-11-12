@@ -1,13 +1,13 @@
 import { Button } from "@/components/Button";
 import { LandmarksOverlay } from "@/components/LandmarksOverlay";
-import api, { HttpError } from "@/lib/api";
+import api, { HttpError, NetworkError } from "@/lib/api";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Platform, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const CAPTURE_INTERVAL = 250;
+const CAPTURE_INTERVAL = 500;
 
 export default function CameraScreen() {
   const [facing, setFacing] = useState<CameraType>("back");
@@ -41,7 +41,13 @@ export default function CameraScreen() {
           skipProcessing: true,
           base64: false,
           shutterSound: false,
-        })) ?? (await (cam as any).takePhoto?.({ qualityPrioritization: "speed" }));
+          imageType: "jpg",
+          exif: false,
+        })) ??
+        (await (cam as any).takePhoto?.({
+          qualityPrioritization: "speed",
+          flash: "off",
+        }));
 
       if (!photo?.uri) throw new Error("Failed to capture photo");
 
@@ -70,8 +76,12 @@ export default function CameraScreen() {
       if (error instanceof HttpError && error.statusCode === 404) {
         setPrediction(null); // No hand detected
         setLandmarks([]);
-      } else
-      if (error instanceof Error && error.message === "Failed to capture photo") {
+      } else if (error instanceof NetworkError) {
+        // Network connectivity issue - show more helpful message
+        console.error("Network error - Cannot reach server:", error.message);
+        setPrediction(null);
+        setLandmarks([]);
+      } else if (error instanceof Error && error.message === "Failed to capture photo") {
         // Ignore capture errors
       } else {
         console.warn("Capture error:", error);
@@ -111,11 +121,11 @@ export default function CameraScreen() {
 
   return (
     <View className="flex-1 bg-[#F2F2F2]">
-      <CameraView ref={cameraRef} facing={facing} style={{ flex: 1 }} />
+      <CameraView ref={cameraRef} facing={facing} style={{ flex: 1 }} animateShutter={false} />
       <LandmarksOverlay
         landmarks={landmarks}
         visible={showLandmarks}
-        mirrored={facing === "back"}
+        mirrored={facing === "front"}
       />
 
       <SafeAreaView
