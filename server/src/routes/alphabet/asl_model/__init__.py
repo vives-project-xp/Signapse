@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException
-
-from smart_gestures.alphabet.asl_model import get_classes, ASLModel
+from smart_gestures.alphabet.asl_model import ASLModel, get_classes
 
 from const import FastAPITags
 from schemas import ClassesResponse, PredictBody, PredictResponse

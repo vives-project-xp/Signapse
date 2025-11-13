@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 
 from const import FastAPITags
-from . import asl_model
-from . import vgt_model
+
+from . import asl_model, vgt_model
 
 router = APIRouter(
     prefix="/alphabet",
