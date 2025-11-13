@@ -218,6 +218,6 @@ __marimo__/
 .streamlit/secrets.toml
 
 # ignored by lakectl local
-package/smart_gestures/gestures/lstm_model/data/*
-!package/smart_gestures/gestures/lstm_model/data/.lakefs_ref.yaml
+package\smart_gestures\gestures\lstm_model\dataset\*
+package\smart_gestures\gestures\lstm_model\dataset\.lakefs_ref.yaml
 # End ignored by lakectl local
