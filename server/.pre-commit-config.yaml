@@ -1,3 +1,7 @@
+# Server-specific pre-commit config that only checks files in the server/src/ directory
+# Since git root is at SmartGlasses/, paths are relative to that
+files: "^server/src/.*"
+
 repos:
   - repo: https://github.com/psf/black
     rev: 24.1.0
