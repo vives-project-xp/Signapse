@@ -4,6 +4,7 @@ import os
 import dotenv
 import time
 import mediapipe as mp
+import mouse  
 
 # Add the holistic model and drawing utilities
 mp_holistic = mp.solutions.holistic
@@ -139,12 +140,12 @@ with mp_holistic.Holistic(min_detection_confidence=0.5,
             key = cv2.waitKey(10) & 0xFF
 
             # If the "q" key is pressed, exit
-            if key == ord("q"):
+            if key == ord("q") or mouse.is_pressed(button='right'):
                 print("Exiting...")
                 quite_flag = True
                 break
             # If the "space" key is pressed, start/stop recording
-            if key == ord(" "):
+            if key == ord(" ") or mouse.is_pressed(button='left'):
                 if not is_recording:
                     is_recording = True
                     print(f"[Sequence {seq}] Recording started.")
