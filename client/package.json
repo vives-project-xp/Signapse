@@ -58,7 +58,9 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.14",
+    "@types/node": "^24.10.1",
     "@types/react": "~19.1.0",
+    "eas-cli": "^16.27.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
     "husky": "^9.1.7",

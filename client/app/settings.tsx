@@ -135,13 +135,13 @@ export default function Settings() {
   const SettingsData = [
     {
       key: "main",
-      title: "App Settings",
-      content: "Configure your preferences below.",
+      title: "App instellingen",
+      content: "configureer je voorkeuren hieronder.",
     },
     {
       key: "AI_VERSION",
       title: "AI Model",
-      content: "Choose your preferred AI version.",
+      content: "Kies je voorkeurs AI-versie.",
       options: [
         {
           label: "Vlaamse gebarentaal - alfabet",
@@ -162,18 +162,18 @@ export default function Settings() {
     },
     {
       key: "THEME",
-      title: "Theme",
-      content: "Select light or dark mode.",
+      title: "Thema",
+      content: "Selecteer licht of donker modus.",
       options: [
-        { label: "Light", value: "light" },
-        { label: "Dark", value: "dark" },
-        { label: "System", value: "system" },
+        { label: "Licht", value: "light" },
+        { label: "Donker", value: "dark" },
+        { label: "Systeem", value: "system" },
       ],
     },
     {
       key: "apistuff",
       title: "API URL",
-      content: `URL: ${BASE_URL}\nBackend version: v${apiVersion}`,
+      content: `URL: ${BASE_URL}\nbackend versie: v${apiVersion}`,
     },
   ];
 

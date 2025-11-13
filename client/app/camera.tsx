@@ -119,7 +119,7 @@ export default function CameraScreen() {
   if (!permission) {
     return (
       <View className="flex-1 items-center justify-center p-6">
-        <Text className="mb-4 text-center">Loading camera...</Text>
+        <Text className="mb-4 text-center">camera laden...</Text>
       </View>
     );
   }
@@ -127,9 +127,9 @@ export default function CameraScreen() {
   if (!permission || !permission.granted) {
     return (
       <View className="flex-1 items-center justify-center p-6">
-        <Text className="mb-4 text-center">Camera permission is required</Text>
-        <Button onPress={requestPermission} label="Grant permission" />
-        <Button onPress={() => router.push("/")} label="Back" />
+        <Text className="mb-4 text-center">camera toegang is noodzakelijk</Text>
+        <Button onPress={requestPermission} label="Toestemming geven" />
+        <Button onPress={() => router.push("/")} label="Terug" />
       </View>
     );
   }
