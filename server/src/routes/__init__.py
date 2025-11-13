@@ -1,7 +1,4 @@
-from . import root
-from . import ws
-from . import alphabet
-from . import keypoints
+from . import alphabet, keypoints, root, ws
 
 __all__ = [
     "root",

@@ -1,7 +1,9 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+
 from websocket import connection_manager as manager
 
 router = APIRouter()
+
 
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -15,7 +17,7 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
-            # simple broadcast protocol; you can replace with JSON or other formats
+            # simple broadcast protocol
             await manager.broadcast(f"{client_id}: {data}")
     except WebSocketDisconnect:
         manager.disconnect(client_id)
