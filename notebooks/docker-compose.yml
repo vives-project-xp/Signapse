@@ -3,8 +3,8 @@ services:
     image: quay.io/minio/minio:latest
     container_name: minio
     ports:
-      - "9000:9000"   # S3 API
-      - "9001:9001"   # Web console
+      - "9000:9000" # S3 API
+      - "9001:9001" # Web console
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
@@ -31,10 +31,10 @@ services:
 
   lakefs:
     image: treeverse/lakefs:latest
-    depends_on: [postgres,minio]
+    depends_on: [postgres, minio]
     container_name: lakefs
     ports:
-      - "8000:8000"                      # UI + S3 Gateway endpoint
+      - "8000:8000" # UI + S3 Gateway endpoint
     environment:
       LAKEFS_DATABASE_TYPE: "postgres"
       LAKEFS_DATABASE_CONNECTION_STRING: "postgres://lakefs:lakefs@postgres:5432/lakefs?sslmode=disable"
@@ -69,30 +69,42 @@ services:
       retries: 5
     restart: unless-stopped
 
-  python3.12:
-    container_name: python3.12
-    build:
-      context: .
-      dockerfile: dockerfile.python3.12
-    working_dir: /app
-    volumes:
-      - ./:/app
-    environment:
-      LAKEFS_BLOCKSTORE_S3_ENDPOINT: "http://minio:9000"
-      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
-      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
-      LAKEFS_ENDPOINT: "http://lakefs:8000"
-      LAKEFS_AUTH_ENCRYPT_SECRET_KEY: ${LAKEFS_AUTH_ENCRYPT_SECRET_KEY}
-      LAKEFS_ACCESS_KEY_ID: ${LAKEFS_ACCESS_KEY_ID}
-      LAKEFS_SECRET_ACCESS_KEY: ${LAKEFS_SECRET_ACCESS_KEY}
+  registry-server:
+    container_name: registry-server
+    image: registry:2.8.2
+    restart: always
     ports:
-      - "8888:8888"  # Jupyter Notebook
-      - "7860:7860"  # Gradio default
+      - "5000:5000"
+    environment:
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin: "[http://edge-ai-11.tail539c2b.ts.net:5001]"
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods: "[HEAD,GET,OPTIONS,DELETE]"
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Credentials: "[true]"
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers: "[Authorization,Accept,Cache-Control]"
+      REGISTRY_HTTP_HEADERS_Access-Control-Expose-Headers: "[Docker-Content-Digest]"
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+    volumes:
+      - ./registry/data:/var/lib/registry
+
+  registry-ui:
+    container_name: registry-ui
+    image: joxit/docker-registry-ui:main
+    restart: always
+    ports:
+      - 5001:80
     depends_on:
-      - minio
-      - lakefs
-    command: ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root"]
-    restart: unless-stopped
+      - registry-server
+    environment:
+      - SINGLE_REGISTRY=true
+      - REGISTRY_TITLE=Docker Registry UI
+      - DELETE_IMAGES=true
+      - SHOW_CONTENT_DIGEST=true
+      - NGINX_PROXY_PASS_URL=http://registry-server:5000
+      - SHOW_CATALOG_NB_TAGS=true
+      - CATALOG_MIN_BRANCHES=1
+      - CATALOG_MAX_BRANCHES=1
+      - TAGLIST_PAGE_SIZE=100
+      - REGISTRY_SECURED=false
+      - CATALOG_ELEMENTS_LIMIT=1000
 
 volumes:
   pg_data:
