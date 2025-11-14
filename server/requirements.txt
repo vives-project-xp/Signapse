@@ -1,18 +1,7 @@
 fastapi[standard]~=0.119.0
-torch~=2.9.0
 numpy~=2.3.4
 pandas~=2.3.3
 typing_extensions~=4.15.0
 tqdm
-# ../notebooks/package
 mediapipe>=0.10.14
-opencv-python>=4.11.0.86
-
-
-# Formatters, linters, type checkers and pre-commit hooks
-black~=25.9.0
-isort~=7.0.0
-flake8~=7.3.0
-flake8-pyproject~=1.2.3
-mypy~=1.18.2
-pre-commit~=4.3.0
+opencv-python-headless>=4.11.0.86

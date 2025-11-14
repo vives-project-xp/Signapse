@@ -1,25 +1,27 @@
 FROM python:3.12-slim
 
+# Install runtime dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl \
+    libgl1 \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
+# Copy and install Python dependencies
 COPY ./server/requirements.txt .
 
-RUN apt-get update  && \
-    apt-get install -y \
-        curl \
-        libgl1 \
-        libglib2.0-0 \
-        && \
-    rm -rf /var/lib/apt/lists/*
+RUN pip install --no-cache-dir -q -r requirements.txt
 
-RUN pip install -q -r requirements.txt
-
+# Copy and install local package
 COPY ./notebooks/package /package
+RUN pip install --no-cache-dir -q -e /package
 
-RUN pip install -e /package
-
+# Copy application code
 COPY ./server .
 
 EXPOSE 8000
 
-CMD ["fastapi","run", "src/main.py", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["fastapi", "run", "src/main.py", "--host", "0.0.0.0", "--port", "8000"]

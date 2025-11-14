@@ -10,15 +10,10 @@ dependencies = [
     "flake8~=7.3.0",
     "flake8-pyproject~=1.2.3",
     "isort~=7.0.0",
-    "mediapipe>=0.10.14",
     "mypy~=1.18.2",
-    "numpy~=2.3.4",
-    "opencv-python>=4.11.0.86",
-    "pandas~=2.3.3",
     "pre-commit~=4.3.0",
-    "torch~=2.9.0",
-    "tqdm>=4.67.1",
     "typing-extensions~=4.15.0",
+    # "smart_gestures==0.2.0",
 ]
 
 
