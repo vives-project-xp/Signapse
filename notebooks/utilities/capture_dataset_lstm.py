@@ -117,7 +117,6 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
 
             key = cv2.waitKey(10) & 0xFF
 
-<<<<<<< HEAD
             # Quit program
             if key == ord("q"):
                 print("Exiting...")
@@ -127,15 +126,6 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
             # --- Mouse click toggles recording ---
             if mouse_clicked:
                 mouse_clicked = False  # reset after detection
-=======
-            # If the "q" key is pressed, exit
-            if key == ord("q") or mouse.is_pressed(button='right'):
-                print("Exiting...")
-                quite_flag = True
-                break
-            # If the "space" key is pressed, start/stop recording
-            if key == ord(" ") or mouse.is_pressed(button='left'):
->>>>>>> 4233c3050bdbfef74bc3b5e51fe1bb19b174eb57
                 if not is_recording:
                     is_recording = True
                     print(f"[Sequence {seq}] Recording started (mouse click).")
