@@ -1,30 +1,19 @@
-"""ASL model subpackage for alphabet.
+"""
+ASL Model Subpackage
 
-Expose commonly used functions and classes from the module files.
+This package contains a high level interface for performing predictions using
+a pre-trained American Sign Language (ASL) alphabet model.
+
+Available Components:
+- ASLModel: A class that encapsulates the ASL alphabet model and its utilities.
+- get_classes: Function to load the classes used by the model.
 """
 
-from .data_utils import (
-    get_classes,
-    get_loaders,
-)
-from .model_utils import (
-    ASLModel,
-    create_model,
-    load_model,
-    DEVICE,
-)
-from .train_utils import (
-    train_model,
-    evaluate_model,
-)
+# Import necessary components
+from .model import ASLModel, get_classes
 
+# Define the public API of the package
 __all__ = [
-    "get_classes",
-    "get_loaders",
     "ASLModel",
-    "create_model",
-    "load_model",
-    "DEVICE",
-    "train_model",
-    "evaluate_model",
+    "get_classes",
 ]
