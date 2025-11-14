@@ -1,8 +1,8 @@
 import sys
 import argparse
-from .data_utils import *
-from .train_utils import *
-from .model_utils import *
+from data_utils import *
+from train_utils import *
+from model_utils import *
 
 
 def main(args: list[str]) -> None:
@@ -10,13 +10,13 @@ def main(args: list[str]) -> None:
     parser.add_argument("--batch_size", type=int, default=32)
     parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--lr", type=float, default=1e-3)
-    parser.add_argument("--output", type=str, default="hand_gesture_model.pth")
+    parser.add_argument("--output", type=str, default="asl_alphabet_model.pth")
     parsed_args = parser.parse_args(args)
 
     # Load data
     classes = get_classes()
-    # TODO: define HAND_LANDMARKS_CSV path
-    dataset = load_and_preprocess_dataset(HAND_LANDMARKS_CSV)  # type: ignore
+    HAND_LANDMARKS_CSV = "data/hand_landmarks.csv"
+    dataset = load_and_preprocess_dataset(HAND_LANDMARKS_CSV)
     train_dataset, val_dataset = split_dataset(
         dataset, val_ratio=0.2, random_seed=42)
     train_loader, val_loader = get_loaders(
@@ -28,11 +28,11 @@ def main(args: list[str]) -> None:
     model = create_model(num_classes, in_dim)
 
     # Train model
-    train_model(model, train_loader, # type: ignore
+    train_model(model, train_loader,
                 epochs=parsed_args.epochs, lr=parsed_args.lr)
 
     # Evaluate model
-    accuracy = evaluate_model(model, val_loader) # type: ignore
+    accuracy = evaluate_model(model, val_loader)
     print(f"Validation Accuracy: {accuracy:.2f}%")
 
     # Save model

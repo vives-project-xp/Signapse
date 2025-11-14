@@ -2,12 +2,19 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
+from typing import Tuple
 from tqdm import tqdm
-from .model_utils import DEVICE
-from .data_utils import LandmarksDataset
+
+from data_utils import *
+from model_utils import *
 
 
-def train_model(model: nn.Module, dataloader: DataLoader[LandmarksDataset], epochs: int = 50, lr: float = 1e-3):
+def train_model(
+    model: nn.Module,
+    dataloader: DataLoader[Tuple[torch.Tensor, torch.Tensor]],
+    epochs: int = 50,
+    lr: float = 1e-3,
+):
     """
     Train the given model using the provided DataLoader.
     """
@@ -17,6 +24,7 @@ def train_model(model: nn.Module, dataloader: DataLoader[LandmarksDataset], epoc
     for epoch in range(epochs):
         model.train()
         running_loss = 0.0
+        total_samples = 0
         for inputs, labels in tqdm(dataloader, desc=f"Epoch {epoch+1}/{epochs}"):
             inputs, labels = inputs.to(DEVICE), labels.to(DEVICE)
 
@@ -24,15 +32,18 @@ def train_model(model: nn.Module, dataloader: DataLoader[LandmarksDataset], epoc
             outputs = model(inputs.view(inputs.size(0), -1))
             loss = criterion(outputs, labels)
             loss.backward()
-            optimizer.step()  # type: ignore
+            optimizer.step()
+            batch_size = inputs.size(0)
+            running_loss += loss.item() * batch_size
+            total_samples += batch_size
 
-            running_loss += loss.item() * inputs.size(0)
-
-        epoch_loss = running_loss / len(dataloader.dataset)
+        epoch_loss = running_loss / total_samples if total_samples > 0 else 0.0
         print(f"Epoch {epoch+1}/{epochs}, Loss: {epoch_loss:.4f}")
 
 
-def evaluate_model(model: nn.Module, dataloader: DataLoader[LandmarksDataset]):
+def evaluate_model(
+    model: nn.Module, dataloader: DataLoader[Tuple[torch.Tensor, torch.Tensor]]
+):
     """
     Evaluate the model on the provided DataLoader.
     """
@@ -47,5 +58,5 @@ def evaluate_model(model: nn.Module, dataloader: DataLoader[LandmarksDataset]):
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
     accuracy = 100 * correct / total
-    print(f'Accuracy: {accuracy:.2f}%')
+    print(f"Accuracy: {accuracy:.2f}%")
     return accuracy
