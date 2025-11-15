@@ -13,8 +13,6 @@ data/
 requirements-dev.txt
 
 # Documentation
-README.md
-docs/
 notebooks/
 !notebooks/package/
 
