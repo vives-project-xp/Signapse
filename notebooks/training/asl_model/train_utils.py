@@ -1,3 +1,8 @@
+"""
+This module provides utility functions for training and evaluating PyTorch models
+for sign language recognition. It includes functions for training a model and
+evaluating its performance on a validation set.
+"""
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -16,7 +21,18 @@ def train_model(
     lr: float = 1e-3,
 ):
     """
-    Train the given model using the provided DataLoader.
+    Trains a PyTorch model for a specified number of epochs.
+
+    This function iterates over the dataset for a given number of epochs,
+    calculates the loss, and updates the model's weights.
+
+    Args:
+        model (nn.Module): The PyTorch model to train.
+        dataloader (DataLoader): The DataLoader for the training data.
+        epochs (int, optional): The number of epochs to train for. 
+            Defaults to 50.
+        lr (float, optional): The learning rate for the optimizer. 
+            Defaults to 1e-3.
     """
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
@@ -45,7 +61,16 @@ def evaluate_model(
     model: nn.Module, dataloader: DataLoader[Tuple[torch.Tensor, torch.Tensor]]
 ):
     """
-    Evaluate the model on the provided DataLoader.
+    Evaluates a PyTorch model on a given dataset.
+
+    This function calculates the accuracy of the model on the provided data.
+
+    Args:
+        model (nn.Module): The PyTorch model to evaluate.
+        dataloader (DataLoader): The DataLoader for the validation data.
+
+    Returns:
+        float: The accuracy of the model in percent.
     """
     model.eval()
     correct = 0

@@ -1,3 +1,9 @@
+"""
+This script trains a model for American Sign Language (ASL) alphabet recognition.
+
+It loads and preprocesses the hand landmark data, creates a model, trains it, 
+evaluates its performance, and saves the trained model to a file.
+"""
 import sys
 import argparse
 from data_utils import *
@@ -6,6 +12,15 @@ from model_utils import *
 
 
 def main(args: list[str]) -> None:
+    """
+    The main function for training the ASL alphabet recognition model.
+
+    It parses command-line arguments, loads the data, creates the model,
+    trains the model, evaluates it, and saves the final model.
+
+    Args:
+        args (list[str]): A list of command-line arguments.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--batch_size", type=int, default=32)
     parser.add_argument("--epochs", type=int, default=20)
