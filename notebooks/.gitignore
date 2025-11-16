@@ -220,4 +220,7 @@ __marimo__/
 # ignored by lakectl local
 package\smart_gestures\gestures\lstm_model\dataset\*
 package\smart_gestures\gestures\lstm_model\dataset\.lakefs_ref.yaml
+
+training/lstm_model/data/
+
 # End ignored by lakectl local
