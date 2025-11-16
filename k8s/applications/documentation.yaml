@@ -51,5 +51,4 @@ spec:
   ports:
     - port: 8000
       targetPort: 8000
-      nodePort: 30850
-  type: NodePort
+  type: ClusterIP
