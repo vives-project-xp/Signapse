@@ -66,90 +66,90 @@ tasks:
   status:
     desc: Check status of all resources
     cmds:
-      - kubectl get all -n smartglasses
+      - kubectl get all -n signapse
 
   status:pods:
     desc: Get pod status
     cmds:
-      - kubectl get pods -n smartglasses
+      - kubectl get pods -n signapse
 
   status:services:
     desc: Get service status
     cmds:
-      - kubectl get services -n smartglasses
+      - kubectl get services -n signapse
 
   status:ingress:
     desc: Get ingress status
     cmds:
-      - kubectl get ingress -n smartglasses
+      - kubectl get ingress -n signapse
 
   status:pvc:
     desc: Get persistent volume claims status
     cmds:
-      - kubectl get pvc -n smartglasses
+      - kubectl get pvc -n signapse
 
   # Logs tasks
   logs:client:
     desc: View client logs
     cmds:
-      - kubectl logs -n smartglasses -l app=client --tail=100 -f
+      - kubectl logs -n signapse -l app=client --tail=100 -f
 
   logs:server:
     desc: View server logs
     cmds:
-      - kubectl logs -n smartglasses -l app=server --tail=100 -f
+      - kubectl logs -n signapse -l app=server --tail=100 -f
 
   logs:registry:
     desc: View registry logs
     cmds:
-      - kubectl logs -n smartglasses -l app=registry --tail=100 -f
+      - kubectl logs -n signapse -l app=registry --tail=100 -f
 
   logs:registry-ui:
     desc: View registry UI logs
     cmds:
-      - kubectl logs -n smartglasses -l app=registry-ui --tail=100 -f
+      - kubectl logs -n signapse -l app=registry-ui --tail=100 -f
 
   logs:documentation:
     desc: View documentation logs
     cmds:
-      - kubectl logs -n smartglasses -l app=documentation --tail=100 -f
+      - kubectl logs -n signapse -l app=documentation --tail=100 -f
 
   # Describe tasks
   describe:client:
     desc: Describe client resources
     cmds:
-      - kubectl describe deployment client -n smartglasses
+      - kubectl describe deployment client -n signapse
 
   describe:server:
     desc: Describe server resources
     cmds:
-      - kubectl describe deployment server -n smartglasses
+      - kubectl describe deployment server -n signapse
 
   describe:registry:
     desc: Describe registry resources
     cmds:
-      - kubectl describe deployment registry -n smartglasses
+      - kubectl describe deployment registry -n signapse
 
   # Restart tasks
   restart:client:
     desc: Restart client deployment
     cmds:
-      - kubectl rollout restart deployment/client -n smartglasses
+      - kubectl rollout restart deployment/client -n signapse
 
   restart:server:
     desc: Restart server deployment
     cmds:
-      - kubectl rollout restart deployment/server -n smartglasses
+      - kubectl rollout restart deployment/server -n signapse
 
   restart:registry:
     desc: Restart registry deployment
     cmds:
-      - kubectl rollout restart deployment/registry -n smartglasses
+      - kubectl rollout restart deployment/registry -n signapse
 
   restart:all:
     desc: Restart all deployments
     cmds:
-      - kubectl rollout restart deployment -n smartglasses
+      - kubectl rollout restart deployment -n signapse
 
   # Delete tasks
   delete:all:
@@ -158,7 +158,6 @@ tasks:
       - task: delete:ingress
       - task: delete:applications
       - task: delete:config-maps
-      - task: delete:volumes
       - task: delete:namespace
 
   delete:namespace:
@@ -205,43 +204,43 @@ tasks:
   forward:client:
     desc: Forward client port to localhost
     cmds:
-      - kubectl port-forward -n smartglasses service/client 8081:80
+      - kubectl port-forward -n signapse service/client 8081:80
 
   forward:server:
     desc: Forward server port to localhost
     cmds:
-      - kubectl port-forward -n smartglasses service/server 8000:8000
+      - kubectl port-forward -n signapse service/server 8000:8000
 
   forward:registry:
     desc: Forward registry port to localhost
     cmds:
-      - kubectl port-forward -n smartglasses service/registry 5000:5000
+      - kubectl port-forward -n signapse service/registry 5000:5000
 
   forward:registry-ui:
     desc: Forward registry UI port to localhost
     cmds:
-      - kubectl port-forward -n smartglasses service/registry-ui 8082:80
+      - kubectl port-forward -n signapse service/registry-ui 8082:80
 
   forward:documentation:
     desc: Forward documentation port to localhost
     cmds:
-      - kubectl port-forward -n smartglasses service/documentation 8083:8000
+      - kubectl port-forward -n signapse service/documentation 8083:8000
 
   # Shell access tasks
   shell:client:
     desc: Open shell in client pod
     cmds:
-      - kubectl exec -it -n smartglasses $(kubectl get pod -n smartglasses -l app=client -o jsonpath='{.items[0].metadata.name}') -- sh
+      - kubectl exec -it -n signapse $(kubectl get pod -n signapse -l app=client -o jsonpath='{.items[0].metadata.name}') -- sh
 
   shell:server:
     desc: Open shell in server pod
     cmds:
-      - kubectl exec -it -n smartglasses $(kubectl get pod -n smartglasses -l app=server -o jsonpath='{.items[0].metadata.name}') -- sh
+      - kubectl exec -it -n signapse $(kubectl get pod -n signapse -l app=server -o jsonpath='{.items[0].metadata.name}') -- sh
 
   shell:registry:
     desc: Open shell in registry pod
     cmds:
-      - kubectl exec -it -n smartglasses $(kubectl get pod -n smartglasses -l app=registry -o jsonpath='{.items[0].metadata.name}') -- sh
+      - kubectl exec -it -n signapse $(kubectl get pod -n signapse -l app=registry -o jsonpath='{.items[0].metadata.name}') -- sh
 
   # Validation tasks
   validate:
@@ -266,12 +265,12 @@ tasks:
   events:
     desc: Show recent events in namespace
     cmds:
-      - kubectl get events -n smartglasses --sort-by='.lastTimestamp'
+      - kubectl get events -n signapse --sort-by='.lastTimestamp'
 
   top:pods:
     desc: Show resource usage of pods
     cmds:
-      - kubectl top pods -n smartglasses
+      - kubectl top pods -n signapse
 
   top:nodes:
     desc: Show resource usage of nodes
