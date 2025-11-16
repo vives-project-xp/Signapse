@@ -40,6 +40,17 @@ spec:
             timeoutSeconds: 5
             failureThreshold: 3
 ---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: docs-pdb
+  namespace: signapse
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: docs
+---
 apiVersion: v1
 kind: Service
 metadata:
