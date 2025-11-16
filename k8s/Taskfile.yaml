@@ -8,7 +8,11 @@ tasks:
       - task: deploy:namespace
       - task: deploy:volumes
       - task: deploy:config-maps
-      - task: deploy:applications
+      - task: deploy:client
+      - task: deploy:server
+      - task: deploy:docs
+      - task: deploy:registry
+      - task: deploy:registry-ui
       - task: deploy:ingress
 
   deploy:namespace:
@@ -19,48 +23,55 @@ tasks:
   deploy:volumes:
     desc: Deploy persistent volume claims
     cmds:
-      - kubectl apply -f volumes/
+      - kubectl apply -f registry.pvc.yaml
 
   deploy:config-maps:
     desc: Deploy config maps
     cmds:
-      - kubectl apply -f config-maps/
-
-  deploy:applications:
-    desc: Deploy all applications
-    cmds:
-      - kubectl apply -f applications/
-
-  deploy:ingress:
-    desc: Deploy ingress resources
-    cmds:
-      - kubectl apply -f ingress/
+      - kubectl apply -f client.config.yaml
+      - kubectl apply -f server.config.yaml
 
   # Individual application deployment
   deploy:client:
     desc: Deploy client application
     cmds:
-      - kubectl apply -f applications/client.yaml
+      - kubectl apply -f client.deployment.yaml
+      - kubectl apply -f client.service.yaml
+      - kubectl apply -f client.hpa.yaml
+      - kubectl apply -f client.pdb.yaml
 
   deploy:server:
     desc: Deploy server application
     cmds:
-      - kubectl apply -f applications/server.yaml
+      - kubectl apply -f server.deployment.yaml
+      - kubectl apply -f server.service.yaml
+      - kubectl apply -f server.hpa.yaml
+      - kubectl apply -f server.pdb.yaml
+
+  deploy:docs:
+    desc: Deploy documentation application
+    cmds:
+      - kubectl apply -f docs.deployment.yaml
+      - kubectl apply -f docs.service.yaml
+      - kubectl apply -f docs.pdh.yaml
 
   deploy:registry:
-    desc: Deploy registry application
+    desc: Deploy registry server application
     cmds:
-      - kubectl apply -f applications/registry.yaml
+      - kubectl apply -f registry-server.deployment.yaml
+      - kubectl apply -f registry-server.service.yaml
 
   deploy:registry-ui:
     desc: Deploy registry UI application
     cmds:
-      - kubectl apply -f applications/registry-ui.yaml
+      - kubectl apply -f registry-ui.deployment.yaml
+      - kubectl apply -f registry-ui.service.yaml
 
-  deploy:documentation:
-    desc: Deploy documentation application
+  deploy:ingress:
+    desc: Deploy ingress resources
     cmds:
-      - kubectl apply -f applications/documentation.yaml
+      - kubectl apply -f ingress.yaml
+      - kubectl apply -f traefik-dashboard.ingress.route.yaml
 
   # Status and monitoring tasks
   status:
@@ -100,19 +111,19 @@ tasks:
       - kubectl logs -n signapse -l app=server --tail=100 -f
 
   logs:registry:
-    desc: View registry logs
+    desc: View registry server logs
     cmds:
-      - kubectl logs -n signapse -l app=registry --tail=100 -f
+      - kubectl logs -n signapse -l app=registry-server --tail=100 -f
 
   logs:registry-ui:
     desc: View registry UI logs
     cmds:
       - kubectl logs -n signapse -l app=registry-ui --tail=100 -f
 
-  logs:documentation:
+  logs:docs:
     desc: View documentation logs
     cmds:
-      - kubectl logs -n signapse -l app=documentation --tail=100 -f
+      - kubectl logs -n signapse -l app=docs --tail=100 -f
 
   # Describe tasks
   describe:client:
@@ -126,9 +137,14 @@ tasks:
       - kubectl describe deployment server -n signapse
 
   describe:registry:
-    desc: Describe registry resources
+    desc: Describe registry server resources
     cmds:
-      - kubectl describe deployment registry -n signapse
+      - kubectl describe deployment registry-server -n signapse
+
+  describe:docs:
+    desc: Describe docs resources
+    cmds:
+      - kubectl describe deployment docs -n signapse
 
   # Restart tasks
   restart:client:
@@ -141,10 +157,20 @@ tasks:
     cmds:
       - kubectl rollout restart deployment/server -n signapse
 
-  restart:registry:
-    desc: Restart registry deployment
+  restart:docs:
+    desc: Restart docs deployment
     cmds:
-      - kubectl rollout restart deployment/registry -n signapse
+      - kubectl rollout restart deployment/docs -n signapse
+
+  restart:registry:
+    desc: Restart registry server deployment
+    cmds:
+      - kubectl rollout restart deployment/registry-server -n signapse
+
+  restart:registry-ui:
+    desc: Restart registry UI deployment
+    cmds:
+      - kubectl rollout restart deployment/registry-ui -n signapse
 
   restart:all:
     desc: Restart all deployments
@@ -156,8 +182,13 @@ tasks:
     desc: Delete all Kubernetes resources
     cmds:
       - task: delete:ingress
-      - task: delete:applications
+      - task: delete:client
+      - task: delete:server
+      - task: delete:docs
+      - task: delete:registry
+      - task: delete:registry-ui
       - task: delete:config-maps
+      - task: delete:volumes
       - task: delete:namespace
 
   delete:namespace:
@@ -168,43 +199,60 @@ tasks:
   delete:volumes:
     desc: Delete persistent volume claims
     cmds:
-      - kubectl delete -f volumes/
+      - kubectl delete -f registry.pvc.yaml
 
   delete:config-maps:
     desc: Delete config maps
     cmds:
-      - kubectl delete -f config-maps/
-
-  delete:applications:
-    desc: Delete all applications
-    cmds:
-      - kubectl delete -f applications/
-
-  delete:ingress:
-    desc: Delete ingress resources
-    cmds:
-      - kubectl delete -f ingress/
+      - kubectl delete -f client.config.yaml
+      - kubectl delete -f server.config.yaml
 
   delete:client:
     desc: Delete client application
     cmds:
-      - kubectl delete -f applications/client.yaml
+      - kubectl delete -f client.deployment.yaml
+      - kubectl delete -f client.service.yaml
+      - kubectl delete -f client.hpa.yaml
+      - kubectl delete -f client.pdb.yaml
 
   delete:server:
     desc: Delete server application
     cmds:
-      - kubectl delete -f applications/server.yaml
+      - kubectl delete -f server.deployment.yaml
+      - kubectl delete -f server.service.yaml
+      - kubectl delete -f server.hpa.yaml
+      - kubectl delete -f server.pdb.yaml
+
+  delete:docs:
+    desc: Delete docs application
+    cmds:
+      - kubectl delete -f docs.deployment.yaml
+      - kubectl delete -f docs.service.yaml
+      - kubectl delete -f docs.pdh.yaml
 
   delete:registry:
-    desc: Delete registry application
+    desc: Delete registry server application
     cmds:
-      - kubectl delete -f applications/registry.yaml
+      - kubectl delete -f registry-server.deployment.yaml
+      - kubectl delete -f registry-server.service.yaml
+
+  delete:registry-ui:
+    desc: Delete registry UI application
+    cmds:
+      - kubectl delete -f registry-ui.deployment.yaml
+      - kubectl delete -f registry-ui.service.yaml
+
+  delete:ingress:
+    desc: Delete ingress resources
+    cmds:
+      - kubectl delete -f ingress.yaml
+      - kubectl delete -f traefik-dashboard.ingress.route.yaml
 
   # Port forwarding tasks
   forward:client:
     desc: Forward client port to localhost
     cmds:
-      - kubectl port-forward -n signapse service/client 8081:80
+      - kubectl port-forward -n signapse service/client 3000:3000
 
   forward:server:
     desc: Forward server port to localhost
@@ -212,19 +260,19 @@ tasks:
       - kubectl port-forward -n signapse service/server 8000:8000
 
   forward:registry:
-    desc: Forward registry port to localhost
+    desc: Forward registry server port to localhost
     cmds:
-      - kubectl port-forward -n signapse service/registry 5000:5000
+      - kubectl port-forward -n signapse service/registry-server 5000:5000
 
   forward:registry-ui:
     desc: Forward registry UI port to localhost
     cmds:
-      - kubectl port-forward -n signapse service/registry-ui 8082:80
+      - kubectl port-forward -n signapse service/registry-ui 5001:5001
 
-  forward:documentation:
+  forward:docs:
     desc: Forward documentation port to localhost
     cmds:
-      - kubectl port-forward -n signapse service/documentation 8083:8000
+      - kubectl port-forward -n signapse service/docs 8080:8000
 
   # Shell access tasks
   shell:client:
@@ -237,29 +285,41 @@ tasks:
     cmds:
       - kubectl exec -it -n signapse $(kubectl get pod -n signapse -l app=server -o jsonpath='{.items[0].metadata.name}') -- sh
 
-  shell:registry:
-    desc: Open shell in registry pod
+  shell:docs:
+    desc: Open shell in docs pod
     cmds:
-      - kubectl exec -it -n signapse $(kubectl get pod -n signapse -l app=registry -o jsonpath='{.items[0].metadata.name}') -- sh
+      - kubectl exec -it -n signapse $(kubectl get pod -n signapse -l app=docs -o jsonpath='{.items[0].metadata.name}') -- sh
+
+  shell:registry:
+    desc: Open shell in registry server pod
+    cmds:
+      - kubectl exec -it -n signapse $(kubectl get pod -n signapse -l app=registry-server -o jsonpath='{.items[0].metadata.name}') -- sh
+
+  shell:registry-ui:
+    desc: Open shell in registry UI pod
+    cmds:
+      - kubectl exec -it -n signapse $(kubectl get pod -n signapse -l app=registry-ui -o jsonpath='{.items[0].metadata.name}') -- sh
 
   # Validation tasks
   validate:
     desc: Validate all YAML files
     cmds:
       - kubectl apply --dry-run=client -f namespace.yaml
-      - kubectl apply --dry-run=client -f volumes/
-      - kubectl apply --dry-run=client -f config-maps/
-      - kubectl apply --dry-run=client -f applications/
-      - kubectl apply --dry-run=client -f ingress/
+      - kubectl apply --dry-run=client -f registry.pvc.yaml
+      - kubectl apply --dry-run=client -f client.config.yaml
+      - kubectl apply --dry-run=client -f server.config.yaml
+      - kubectl apply --dry-run=client -f client.deployment.yaml
+      - kubectl apply --dry-run=client -f server.deployment.yaml
+      - kubectl apply --dry-run=client -f docs.deployment.yaml
+      - kubectl apply --dry-run=client -f registry-server.deployment.yaml
+      - kubectl apply --dry-run=client -f registry-ui.deployment.yaml
+      - kubectl apply --dry-run=client -f ingress.yaml
 
   # Update tasks
   update:all:
     desc: Update all resources (apply changes)
     cmds:
-      - kubectl apply -f volumes/
-      - kubectl apply -f config-maps/
-      - kubectl apply -f applications/
-      - kubectl apply -f ingress/
+      - task: deploy:all
 
   # Troubleshooting tasks
   events:
