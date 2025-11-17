@@ -8,7 +8,9 @@ tasks:
       - task: deploy:namespace
       - task: deploy:volumes
       - task: deploy:config-maps
+      - task: deploy:postgres
       - task: deploy:minio
+      - task: deploy:lakefs
       - task: deploy:client
       - task: deploy:server
       - task: deploy:docs
@@ -26,6 +28,7 @@ tasks:
     cmds:
       - kubectl apply -f registry.pvc.yaml
       - kubectl apply -f minio.pvc.yaml
+      - kubectl apply -f postgres.pvc.yaml
 
   deploy:config-maps:
     desc: Deploy config maps
@@ -33,6 +36,8 @@ tasks:
       - kubectl apply -f client.config.yaml
       - kubectl apply -f server.config.yaml
       - kubectl apply -f minio.config.yaml
+      - kubectl apply -f postgres.config.yaml
+      - kubectl apply -f lakefs.config.yaml
 
   # Individual application deployment
   deploy:client:
@@ -77,6 +82,21 @@ tasks:
       - kubectl apply -f minio.config.yaml
       - kubectl apply -f minio.deployment.yaml
       - kubectl apply -f minio.service.yaml
+
+  deploy:postgres:
+    desc: Deploy PostgreSQL database
+    cmds:
+      - kubectl apply -f postgres.pvc.yaml
+      - kubectl apply -f postgres.config.yaml
+      - kubectl apply -f postgres.deployment.yaml
+      - kubectl apply -f postgres.service.yaml
+
+  deploy:lakefs:
+    desc: Deploy lakeFS data versioning
+    cmds:
+      - kubectl apply -f lakefs.config.yaml
+      - kubectl apply -f lakefs.deployment.yaml
+      - kubectl apply -f lakefs.service.yaml
 
   deploy:ingress:
     desc: Deploy ingress resources
@@ -141,6 +161,16 @@ tasks:
     cmds:
       - kubectl logs -n signapse -l app=minio --tail=100 -f
 
+  logs:postgres:
+    desc: View PostgreSQL logs
+    cmds:
+      - kubectl logs -n signapse -l app=postgres --tail=100 -f
+
+  logs:lakefs:
+    desc: View lakeFS logs
+    cmds:
+      - kubectl logs -n signapse -l app=lakefs --tail=100 -f
+
   # Describe tasks
   describe:client:
     desc: Describe client resources
@@ -166,6 +196,16 @@ tasks:
     desc: Describe MinIO resources
     cmds:
       - kubectl describe deployment minio -n signapse
+
+  describe:postgres:
+    desc: Describe PostgreSQL resources
+    cmds:
+      - kubectl describe deployment postgres -n signapse
+
+  describe:lakefs:
+    desc: Describe lakeFS resources
+    cmds:
+      - kubectl describe deployment lakefs -n signapse
 
   # Restart tasks
   restart:client:
@@ -198,6 +238,16 @@ tasks:
     cmds:
       - kubectl rollout restart deployment/minio -n signapse
 
+  restart:postgres:
+    desc: Restart PostgreSQL deployment
+    cmds:
+      - kubectl rollout restart deployment/postgres -n signapse
+
+  restart:lakefs:
+    desc: Restart lakeFS deployment
+    cmds:
+      - kubectl rollout restart deployment/lakefs -n signapse
+
   restart:all:
     desc: Restart all deployments
     cmds:
@@ -213,7 +263,9 @@ tasks:
       - task: delete:docs
       - task: delete:registry
       - task: delete:registry-ui
+      - task: delete:lakefs
       - task: delete:minio
+      - task: delete:postgres
       - task: delete:config-maps
       - task: delete:namespace
       - cmd: echo "All resources deleted. Except PVCs."
@@ -228,6 +280,7 @@ tasks:
     cmds:
       - kubectl delete -f registry.pvc.yaml
       - kubectl delete -f minio.pvc.yaml
+      - kubectl delete -f postgres.pvc.yaml
 
   delete:config-maps:
     desc: Delete config maps
@@ -235,6 +288,8 @@ tasks:
       - kubectl delete -f client.config.yaml
       - kubectl delete -f server.config.yaml
       - kubectl delete -f minio.config.yaml
+      - kubectl delete -f postgres.config.yaml
+      - kubectl delete -f lakefs.config.yaml
 
   delete:client:
     desc: Delete client application
@@ -277,6 +332,18 @@ tasks:
       - kubectl delete -f minio.deployment.yaml
       - kubectl delete -f minio.service.yaml
 
+  delete:postgres:
+    desc: Delete PostgreSQL application
+    cmds:
+      - kubectl delete -f postgres.deployment.yaml
+      - kubectl delete -f postgres.service.yaml
+
+  delete:lakefs:
+    desc: Delete lakeFS application
+    cmds:
+      - kubectl delete -f lakefs.deployment.yaml
+      - kubectl delete -f lakefs.service.yaml
+
   delete:ingress:
     desc: Delete ingress resources
     cmds:
@@ -314,6 +381,16 @@ tasks:
     cmds:
       - kubectl port-forward -n signapse service/minio 9000:9000 9001:9001
 
+  forward:postgres:
+    desc: Forward PostgreSQL port to localhost
+    cmds:
+      - kubectl port-forward -n signapse service/postgres 5432:5432
+
+  forward:lakefs:
+    desc: Forward lakeFS port to localhost
+    cmds:
+      - kubectl port-forward -n signapse service/lakefs 8000:8000
+
   # Shell access tasks
   shell:client:
     desc: Open shell in client pod
@@ -345,19 +422,35 @@ tasks:
     cmds:
       - kubectl exec -it -n signapse $(kubectl get pod -n signapse -l app=minio -o jsonpath='{.items[0].metadata.name}') -- sh
 
+  shell:postgres:
+    desc: Open shell in PostgreSQL pod
+    cmds:
+      - kubectl exec -it -n signapse $(kubectl get pod -n signapse -l app=postgres -o jsonpath='{.items[0].metadata.name}') -- sh
+
+  shell:lakefs:
+    desc: Open shell in lakeFS pod
+    cmds:
+      - kubectl exec -it -n signapse $(kubectl get pod -n signapse -l app=lakefs -o jsonpath='{.items[0].metadata.name}') -- sh
+
   # Validation tasks
   validate:
     desc: Validate all YAML files
     cmds:
       - kubectl apply --dry-run=client -f namespace.yaml
       - kubectl apply --dry-run=client -f registry.pvc.yaml
+      - kubectl apply --dry-run=client -f minio.pvc.yaml
+      - kubectl apply --dry-run=client -f postgres.pvc.yaml
       - kubectl apply --dry-run=client -f client.config.yaml
       - kubectl apply --dry-run=client -f server.config.yaml
       - kubectl apply --dry-run=client -f minio.config.yaml
+      - kubectl apply --dry-run=client -f postgres.config.yaml
+      - kubectl apply --dry-run=client -f lakefs.config.yaml
       - kubectl apply --dry-run=client -f client.deployment.yaml
       - kubectl apply --dry-run=client -f server.deployment.yaml
       - kubectl apply --dry-run=client -f docs.deployment.yaml
       - kubectl apply --dry-run=client -f minio.deployment.yaml
+      - kubectl apply --dry-run=client -f postgres.deployment.yaml
+      - kubectl apply --dry-run=client -f lakefs.deployment.yaml
       - kubectl apply --dry-run=client -f registry-server.deployment.yaml
       - kubectl apply --dry-run=client -f registry-ui.deployment.yaml
       - kubectl apply --dry-run=client -f ingress.yaml

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lakefs-config
+  namespace: signapse
+data:
+  LAKEFS_DATABASE_TYPE: "postgres"
+  LAKEFS_DATABASE_CONNECTION_STRING: "postgres://lakefs:lakefs@postgres:5432/lakefs?sslmode=disable"
+  PGHOST: "postgres"
+  PGUSER: "lakefs"
+  PGPASSWORD: "lakefs"
+  PGDATABASE: "lakefs"
+  PGPORT: "5432"
+  LAKEFS_BLOCKSTORE_TYPE: "s3"
+  LAKEFS_BLOCKSTORE_S3_ENDPOINT: "http://minio:9000"
+  LAKEFS_BLOCKSTORE_S3_FORCE_PATH_STYLE: "true"
+  LAKEFS_BLOCKSTORE_S3_REGION: "us-east-1"
+  LAKEFS_BLOCKSTORE_S3_DISCOVER_BUCKET_REGION: "false"
+  LAKEFS_BLOCKSTORE_S3_CREDENTIALS_ACCESS_KEY_ID: "minioadmin"
+  LAKEFS_BLOCKSTORE_S3_CREDENTIALS_SECRET_ACCESS_KEY: "minioadmin"
+  LAKEFS_BLOCKSTORE_S3_PRE_SIGNED_ENDPOINT: "http://minio:9000"
+  LAKEFS_AUTH_ENCRYPT_SECRET_KEY: "this-is-a-very-secure-32-char-key-change-in-production"
+  LAKEFS_LOGGING_LEVEL: "INFO"
