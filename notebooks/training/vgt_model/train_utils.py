@@ -4,8 +4,10 @@ import torch
 from typing import Optional, Tuple, Any
 from tqdm import tqdm
 from torch.utils.data import DataLoader
-from smart_gestures.alphabet.vgt_model import DEVICE
-from .callbacks import create_scheduler, EarlyStopping, ModelCheckpoint
+
+from model_utils import *
+from data_utils import *
+from callbacks import *
 
 
 def train_model(
@@ -20,21 +22,6 @@ def train_model(
     checkpoint_kwargs: Optional[dict[str, Any]] = None,
     verbose: bool = True,
 ) -> None:
-    """
-    Train the given model using the provided DataLoader(s), with optional callbacks.
-
-    Args:
-        model: the model to train
-        train_loader: DataLoader for training data
-        val_loader: optional DataLoader for validation data (required for early stopping or ReduceLROnPlateau)
-        epochs: number of epochs
-        lr: learning rate
-        scheduler_type: None | 'plateau' | 'step' | 'cosine'
-        scheduler_kwargs: dict of scheduler parameters
-        early_stopping_kwargs: dict for EarlyStopping(patience, min_delta, mode, restore_best_weights)
-        checkpoint_kwargs: dict for ModelCheckpoint(filepath, monitor, mode, save_best_only)
-        verbose: print metrics per epoch
-    """
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
     scheduler_kwargs = scheduler_kwargs or {}
@@ -45,7 +32,6 @@ def train_model(
     early_stopper = None
     checkpoint = None
 
-    # Determine default monitor based on presence of val_loader
     if early_stopping_kwargs:
         early_stopper = EarlyStopping(**early_stopping_kwargs)
     if checkpoint_kwargs:
@@ -66,23 +52,19 @@ def train_model(
             running_loss += loss.item() * inputs.size(0)
 
         train_epoch_loss = running_loss / \
-            len(train_loader.dataset)  # type: ignore
+            len(train_loader.dataset)
 
-        # Validation pass
         val_loss, val_acc = None, None
         if val_loader is not None:
             val_loss, val_acc = evaluate_metrics(model, val_loader, criterion)
 
-        # Step LR scheduler
         if scheduler is not None:
             if scheduler_type == "plateau":
-                # Needs a metric to step on; prefer val_loss if available
                 metric = val_loss if val_loss is not None else train_epoch_loss
-                scheduler.step(metric)  # type: ignore
+                scheduler.step(metric)
             else:
-                scheduler.step()  # type: ignore
+                scheduler.step()
 
-        # Early stopping on monitored metric (default val_loss if available, else train loss)
         if early_stopper is not None:
             monitor_value = val_loss if (val_loss is not None and early_stopper.mode == "min") else (
                 val_acc if (val_acc is not None and early_stopper.mode ==
@@ -92,9 +74,7 @@ def train_model(
             if stop and verbose:
                 print(f"Early stopping at epoch {epoch+1}")
 
-        # Checkpointing
         if checkpoint is not None:
-            # Choose metric consistent with checkpoint.mode
             metric_value = val_loss if (checkpoint.mode == "min" and val_loss is not None) else (
                 val_acc if (checkpoint.mode ==
                             "max" and val_acc is not None) else train_epoch_loss
@@ -112,16 +92,12 @@ def train_model(
             else:
                 print(
                     f"Epoch {epoch+1}/{epochs} | Train Loss: {train_epoch_loss:.4f}")
-
-        # Respect early stopping decision
+                
         if early_stopper is not None and early_stopper.should_stop:
             break
 
 
 def evaluate_model(model: nn.Module, dataloader: DataLoader[dict[str, Any]]) -> float:
-    """
-    Evaluate the model on the provided DataLoader.
-    """
     model.eval()
     correct = 0
     total = 0
@@ -137,7 +113,6 @@ def evaluate_model(model: nn.Module, dataloader: DataLoader[dict[str, Any]]) -> 
 
 
 def evaluate_metrics(model: nn.Module, dataloader: DataLoader[dict[str, Any]], criterion: Optional[nn.Module] = None) -> Tuple[float, float]:
-    """Return (avg_loss, accuracy_percent) for a dataloader."""
     was_training = model.training
     model.eval()
     total = 0

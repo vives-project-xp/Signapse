@@ -1,17 +1,17 @@
-from .train_utils import train_model, evaluate_model
 import argparse
 import sys
 
-from .model_utils import create_model, save_model
-from .data_utils import load_dataset_normalized, split_dataset, get_loaders, get_classes
-
+from model_utils import *
+from data_utils import *
+from train_utils import *
+from callbacks import *
 
 def main(args):
     parser = argparse.ArgumentParser()
     parser.add_argument("--batch_size", type=int, default=32)
     parser.add_argument("--epochs", type=int, default=50)
     parser.add_argument("--lr", type=float, default=1e-3)
-    parser.add_argument("--output", type=str, default="vgt_model.pth")
+    parser.add_argument("--output", type=str, default="vgt_alphabet_model.pth")
     # Augmentation
     parser.add_argument("--augment", action="store_true",
                         help="Enable data augmentation")
@@ -42,18 +42,22 @@ def main(args):
     # Load data
     classes = get_classes()
     dataset = load_dataset_normalized(
-        HAND_LANDMARKS_JSON,  # type: ignore  # TODO: define HAND_LANDMARKS_JSON path
-        as_sequence=False,
+        json_file=DATASET,
+        as_sequence=True,
         scale_method="wrist_to_middle",
         augment=parsed_args.augment,
         augment_prob=parsed_args.augment_prob,
         noise_std=parsed_args.noise_std,
         rotate_deg=parsed_args.rotate_deg,
     )
-    train_dataset, val_dataset = split_dataset(
-        dataset, val_ratio=0.2, random_seed=42)
-    train_loader, val_loader = get_loaders(
-        train_dataset, val_dataset, batch_size=parsed_args.batch_size)  # type: ignore
+    train_size = int(0.8 * len(dataset))
+    val_size = len(dataset) - train_size
+    train_dataset, val_dataset = torch.utils.data.random_split(
+        dataset, [train_size, val_size])
+    train_loader = torch.utils.data.DataLoader(
+        train_dataset, batch_size=parsed_args.batch_size, shuffle=True)
+    val_loader = torch.utils.data.DataLoader(
+        val_dataset, batch_size=parsed_args.batch_size, shuffle=False)
 
     # Create model
     in_dim = 63  # 21 landmarks * 3 coordinates (x, y, z)

@@ -7,16 +7,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-# Import package level constants
-try:
-    # Relative import when used as a package
-    from smart_gestures.alphabet.const import NUM_POINTS, IN_DIM
-except ImportError:
-    # Otherwise, use absolute import
-    from ..const import NUM_POINTS, IN_DIM
-
-# print (f"NUM_POINTS: {NUM_POINTS}, IN_DIM: {IN_DIM}")
-
 # Define the constant
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 THIS_DIR = Path(__file__).parent
@@ -25,6 +15,9 @@ MODEL_DIR = THIS_DIR / "models"
 
 CLASSES_FILE = DATA_DIR / "classes.json"
 MODEL_FILE = MODEL_DIR / "asl_alphabet_model.pth"
+
+NUM_POINTS = 21  # Number of hand landmarks
+IN_DIM = NUM_POINTS * 3  # Each landmark has x, y, z coordinates
 
 # Check if directories exist while loading the modules
 if not CLASSES_FILE.exists():
