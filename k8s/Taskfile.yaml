@@ -8,6 +8,7 @@ tasks:
       - task: deploy:namespace
       - task: deploy:volumes
       - task: deploy:config-maps
+      - task: deploy:minio
       - task: deploy:client
       - task: deploy:server
       - task: deploy:docs
@@ -24,12 +25,14 @@ tasks:
     desc: Deploy persistent volume claims
     cmds:
       - kubectl apply -f registry.pvc.yaml
+      - kubectl apply -f minio.pvc.yaml
 
   deploy:config-maps:
     desc: Deploy config maps
     cmds:
       - kubectl apply -f client.config.yaml
       - kubectl apply -f server.config.yaml
+      - kubectl apply -f minio.config.yaml
 
   # Individual application deployment
   deploy:client:
@@ -66,6 +69,14 @@ tasks:
     cmds:
       - kubectl apply -f registry-ui.deployment.yaml
       - kubectl apply -f registry-ui.service.yaml
+
+  deploy:minio:
+    desc: Deploy MinIO object storage
+    cmds:
+      - kubectl apply -f minio.pvc.yaml
+      - kubectl apply -f minio.config.yaml
+      - kubectl apply -f minio.deployment.yaml
+      - kubectl apply -f minio.service.yaml
 
   deploy:ingress:
     desc: Deploy ingress resources
@@ -125,6 +136,11 @@ tasks:
     cmds:
       - kubectl logs -n signapse -l app=docs --tail=100 -f
 
+  logs:minio:
+    desc: View MinIO logs
+    cmds:
+      - kubectl logs -n signapse -l app=minio --tail=100 -f
+
   # Describe tasks
   describe:client:
     desc: Describe client resources
@@ -145,6 +161,11 @@ tasks:
     desc: Describe docs resources
     cmds:
       - kubectl describe deployment docs -n signapse
+
+  describe:minio:
+    desc: Describe MinIO resources
+    cmds:
+      - kubectl describe deployment minio -n signapse
 
   # Restart tasks
   restart:client:
@@ -172,6 +193,11 @@ tasks:
     cmds:
       - kubectl rollout restart deployment/registry-ui -n signapse
 
+  restart:minio:
+    desc: Restart MinIO deployment
+    cmds:
+      - kubectl rollout restart deployment/minio -n signapse
+
   restart:all:
     desc: Restart all deployments
     cmds:
@@ -187,9 +213,10 @@ tasks:
       - task: delete:docs
       - task: delete:registry
       - task: delete:registry-ui
+      - task: delete:minio
       - task: delete:config-maps
-      - task: delete:volumes
       - task: delete:namespace
+      - cmd: echo "All resources deleted. Except PVCs."
 
   delete:namespace:
     desc: Delete namespace (and all resources within)
@@ -200,12 +227,14 @@ tasks:
     desc: Delete persistent volume claims
     cmds:
       - kubectl delete -f registry.pvc.yaml
+      - kubectl delete -f minio.pvc.yaml
 
   delete:config-maps:
     desc: Delete config maps
     cmds:
       - kubectl delete -f client.config.yaml
       - kubectl delete -f server.config.yaml
+      - kubectl delete -f minio.config.yaml
 
   delete:client:
     desc: Delete client application
@@ -242,6 +271,12 @@ tasks:
       - kubectl delete -f registry-ui.deployment.yaml
       - kubectl delete -f registry-ui.service.yaml
 
+  delete:minio:
+    desc: Delete MinIO application
+    cmds:
+      - kubectl delete -f minio.deployment.yaml
+      - kubectl delete -f minio.service.yaml
+
   delete:ingress:
     desc: Delete ingress resources
     cmds:
@@ -274,6 +309,11 @@ tasks:
     cmds:
       - kubectl port-forward -n signapse service/docs 8080:8000
 
+  forward:minio:
+    desc: Forward MinIO ports to localhost
+    cmds:
+      - kubectl port-forward -n signapse service/minio 9000:9000 9001:9001
+
   # Shell access tasks
   shell:client:
     desc: Open shell in client pod
@@ -300,6 +340,11 @@ tasks:
     cmds:
       - kubectl exec -it -n signapse $(kubectl get pod -n signapse -l app=registry-ui -o jsonpath='{.items[0].metadata.name}') -- sh
 
+  shell:minio:
+    desc: Open shell in MinIO pod
+    cmds:
+      - kubectl exec -it -n signapse $(kubectl get pod -n signapse -l app=minio -o jsonpath='{.items[0].metadata.name}') -- sh
+
   # Validation tasks
   validate:
     desc: Validate all YAML files
@@ -308,9 +353,11 @@ tasks:
       - kubectl apply --dry-run=client -f registry.pvc.yaml
       - kubectl apply --dry-run=client -f client.config.yaml
       - kubectl apply --dry-run=client -f server.config.yaml
+      - kubectl apply --dry-run=client -f minio.config.yaml
       - kubectl apply --dry-run=client -f client.deployment.yaml
       - kubectl apply --dry-run=client -f server.deployment.yaml
       - kubectl apply --dry-run=client -f docs.deployment.yaml
+      - kubectl apply --dry-run=client -f minio.deployment.yaml
       - kubectl apply --dry-run=client -f registry-server.deployment.yaml
       - kubectl apply --dry-run=client -f registry-ui.deployment.yaml
       - kubectl apply --dry-run=client -f ingress.yaml
