@@ -45,6 +45,7 @@ def main(args: list[str]) -> None:
     classes = dataset.classes # Retrieve class list from the loaded dataset
     print(f"Total sequences loaded: {len(dataset)}")
     print(f"Training sequences: {len(train_dataset)}, Validation sequences: {len(val_dataset)}")
+    print(f"Fixed Sequence Length (T_max): {SEQUENCE_LENGTH}") # Added printout
     print(f"Classes: {classes}")
 
     print("\n--- 2. Model Creation ---")

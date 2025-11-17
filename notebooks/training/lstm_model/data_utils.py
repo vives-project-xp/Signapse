@@ -3,14 +3,30 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader, random_split
 from pathlib import Path
-from typing import cast, Callable, List
+from typing import cast, Callable, List, Tuple
+# Note: torch.nn.utils.rnn.pad_sequence is not needed here since we are implementing padding manually.
 
 # --- Configuration Adjustment ---
 THIS_DIR = Path(__file__).parent
-# 1. Use environment variable for the root data path (best practice).
-# 2. If the env var is not set, default to the 'data' folder next to data_utils.py.
-#    This resolves to: SMARTGLASSES/notebooks/training/lstm_model/data
-DATA_PATH = Path(os.getenv("LAKEFS_DATA_PATH")) if os.getenv("LAKEFS_DATA_PATH") else THIS_DIR / "data"
+
+# Data is currently located at: SMARTGLASSES/notebooks/package/smart_gestures/gestures/lstm_model/dataset
+# Calculate the default path relative to data_utils.py (which is in SMARTGLASSES/notebooks/training/lstm_model/)
+DEFAULT_DATA_PATH = (
+    THIS_DIR.parents[1] 
+    / "package"
+    / "smart_gestures"
+    / "gestures"
+    / "lstm_model"
+    / "dataset"
+)
+
+# DATA_PATH uses the environment variable if available, otherwise it uses the corrected default path.
+DATA_PATH = Path(os.getenv("LAKEFS_DATA_PATH")) if os.getenv("LAKEFS_DATA_PATH") else DEFAULT_DATA_PATH
+
+# --- Global Configuration for Sequence Handling ---
+# Increased to 40 frames to avoid truncation of the longest sequences
+SEQUENCE_LENGTH = 40 
+
 
 # --- Data Normalization Utility (Sequence-aware) ---
 
@@ -183,17 +199,70 @@ def split_dataset(
     return train_dataset, val_dataset
 
 
+# --- Collate Function for Padding and Lengths ---
+
+def pad_collate(batch: List[Tuple[torch.Tensor, torch.Tensor]]) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    """
+    Pads the sequences in the batch to SEQUENCE_LENGTH (40 frames), truncates long sequences, 
+    and returns a tensor of the original sequence lengths.
+    
+    Returns: (X_batch, y_batch, lengths_batch)
+    """
+    # 1. Separate inputs (X) and labels (y)
+    sequences = [item[0] for item in batch]
+    labels = [item[1] for item in batch]
+    
+    padded_sequences = []
+    # Store the original length of the sequence before padding/truncation
+    sequence_lengths = [] 
+    
+    for seq in sequences:
+        N_frames, N_features = seq.shape
+        
+        if N_frames > SEQUENCE_LENGTH:
+            # Truncate long sequences
+            padded_seq = seq[:SEQUENCE_LENGTH, :]
+            sequence_lengths.append(SEQUENCE_LENGTH)
+        elif N_frames < SEQUENCE_LENGTH:
+            # Pad short sequences with zeros
+            padding = torch.zeros((SEQUENCE_LENGTH - N_frames, N_features), dtype=seq.dtype)
+            padded_seq = torch.cat([seq, padding], dim=0)
+            sequence_lengths.append(N_frames) # Use the original length
+        else:
+            # Sequence is already the correct length
+            padded_seq = seq
+            sequence_lengths.append(SEQUENCE_LENGTH)
+
+        padded_sequences.append(padded_seq)
+
+    # Convert sequence lengths to tensor
+    # NOTE: The lengths must be sorted by decreasing length for nn.utils.rnn.pack_padded_sequence 
+    # if you choose to implement that later. For now, we return them unsorted.
+    lengths_batch = torch.tensor(sequence_lengths, dtype=torch.int64)
+    X_batch = torch.stack(padded_sequences)
+    y_batch = torch.stack(labels)
+    
+    # Return the lengths tensor for use in masking/packing later in the model
+    return X_batch, y_batch, lengths_batch
+
+
 def get_loaders(
     train_dataset: SequenceDataset, val_dataset: SequenceDataset, batch_size: int = 32
 ):
     """
-    Creates DataLoader instances for the training and validation sequence datasets.
-    
-    NOTE: For variable-length sequences, a custom collate_fn is typically 
-    required to handle padding within the batch. For simplicity, we use 
-    the default DataLoader here, assuming padding/masking is handled in 
-    the LSTM model's training loop or that sequences are pre-padded/cropped.
+    Creates DataLoader instances using a custom collate_fn to handle padding and return sequence lengths.
     """
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+    # Pass the custom collate function
+    train_loader = DataLoader(
+        train_dataset, 
+        batch_size=batch_size, 
+        shuffle=True, 
+        collate_fn=pad_collate
+    )
+    val_loader = DataLoader(
+        val_dataset, 
+        batch_size=batch_size, 
+        shuffle=False, 
+        collate_fn=pad_collate
+    )
     return train_loader, val_loader

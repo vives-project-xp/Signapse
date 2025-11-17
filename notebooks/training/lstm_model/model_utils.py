@@ -8,10 +8,11 @@ from typing import cast
 import numpy as np
 import torch
 import torch.nn as nn
+from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
 # Assuming data_utils is available for context
-from data_utils import * # --- Configuration ---
-# Define device for PyTorch operations (CUDA if available, otherwise CPU)
+# Note: Data_utils is imported for DEVICE, which is fine here.
+from data_utils import * # Define device for PyTorch operations (CUDA if available, otherwise CPU)
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Define base directories for model files
@@ -20,11 +21,7 @@ MODEL_DIR = THIS_DIR / "models"
 MODEL_FILE = MODEL_DIR / "lstm_model.pth" 
 
 # Path to the 'package/smart_gestures/gestures/lstm_model/models' directory.
-# Assuming this model_utils.py is two levels deep from 'training' 
-# (e.g., SMARTGLASSES/notebooks/training/lstm_model/model_utils.py)
-
-# THIS_DIR.parents[4] should lead up to SMARTGLASSES/
-# Then navigate down to: notebooks/package/smart_gestures/gestures/lstm_model/
+# THIS_DIR.parents[4] leads up to SMARTGLASSES/
 PACKAGE_ROOT = THIS_DIR.parents[4] 
 
 PACKAGE_MODEL_DIR = (
@@ -38,11 +35,12 @@ PACKAGE_MODEL_DIR = (
 )
 PACKAGE_MODEL_FILE = PACKAGE_MODEL_DIR / "lstm_model.pth"
 
-# --- LSTM Model Definition (Same as before) ---
+# --- LSTM Model Definition ---
 
 class GestureLSTM(nn.Module):
     """
     A PyTorch LSTM model designed for sequence classification of sign language gestures.
+    Implements internal sorting/unsorting to safely use sequence packing.
     """
     def __init__(self, in_dim: int, hidden_size: int, num_layers: int, num_classes: int, dropout: float = 0.2):
         super(GestureLSTM, self).__init__()
@@ -59,11 +57,46 @@ class GestureLSTM(nn.Module):
         self.fc = nn.Linear(hidden_size, num_classes)
         self.dropout = nn.Dropout(dropout)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        lstm_out, _ = self.lstm(x)
-        last_time_step_out = lstm_out[:, -1, :]
+    # CRITICAL FIX: Handles sorting/unsorting internally for robustness
+    def forward(self, x: torch.Tensor, sequence_lengths: torch.Tensor) -> torch.Tensor:
+        
+        # --- 1. Sort the batch by sequence length (Mandatory for packing) ---
+        # Get sorted lengths and the permutation indices
+        sequence_lengths_sorted, perm_idx = sequence_lengths.sort(0, descending=True)
+        
+        # Apply the permutation to the data
+        x_sorted = x[perm_idx]
+        
+        # --- 2. Pack the sequence ---
+        # Pack the sequences, skipping computation over zero padding
+        packed_input = pack_padded_sequence(
+            x_sorted, 
+            # Needs to be on CPU for packing (or use .data.cpu())
+            sequence_lengths_sorted.cpu(), 
+            batch_first=True, 
+            enforce_sorted=True
+        )
+        
+        # 3. Pass packed sequence through LSTM
+        packed_output, _ = self.lstm(packed_input)
+        
+        # 4. Unpack the sequence back to the padded format
+        # output retains the sorted order
+        output, _ = pad_packed_sequence(packed_output, batch_first=True)
+        
+        # 5. Get the output corresponding to the *last unpadded time step*
+        # Use the sorted lengths to index the last relevant frame
+        last_time_step_out_sorted = output[torch.arange(output.size(0)), sequence_lengths_sorted - 1]
+        
+        # --- 6. Unsort the batch back to the original order ---
+        # Get the inverse permutation to restore the original batch order
+        _, unperm_idx = perm_idx.sort(0)
+        last_time_step_out = last_time_step_out_sorted[unperm_idx]
+        
+        # 7. Classification
         out = self.dropout(last_time_step_out)
         out = self.fc(out)
+        
         return out
 
 
@@ -84,7 +117,7 @@ def create_model(
     )
     return model.to(DEVICE)
 
-# --- Save and Load Utilities (Adjusted paths, logic unchanged) ---
+# --- Save and Load Utilities (unchanged) ---
 
 def save_model(model: nn.Module, path: str = "lstm_model.pth") -> None:
     """
@@ -101,7 +134,6 @@ def save_model(model: nn.Module, path: str = "lstm_model.pth") -> None:
         package_path = PACKAGE_MODEL_DIR / path
         torch.save(model.state_dict(), package_path)
     except Exception as e:
-        # Note: Added 'as e' for proper exception handling if needed for debugging
         print(f"Warning: Could not save model to package directory: {e}")
         pass
 
