@@ -64,7 +64,7 @@ class LandmarksDataset(Dataset):
         return x, y
 
 
-def _normalize_landmarks(lm, root_idx=0, scale_method="wrist_to_middle")-> np.ndarray:
+def normalize_landmarks(lm, root_idx=0, scale_method="wrist_to_middle")-> np.ndarray:
     """
     Normalize a single sample of landmarks.
     - translate so the root (wrist) is at the origin
@@ -114,7 +114,7 @@ def load_dataset_normalized(
     df = pd.DataFrame(data)
     df['class'] = df['class'].astype('category')
 
-    X_list = [_normalize_landmarks(
+    X_list = [normalize_landmarks(
         lm, root_idx=0, scale_method=scale_method) for lm in df['landmarks']]
     y = np.array(df['class'].cat.codes, dtype=np.int64)
     classes = df['class'].cat.categories.tolist()
@@ -204,3 +204,20 @@ def apply_augmentations(points: np.ndarray, noise_std: float = 0.01, max_rotate_
         pts = pts + np.random.normal(0.0, noise_std,
                                      size=pts.shape).astype(np.float32)
     return pts.astype(np.float32)
+
+
+# example usage of the module 
+if __name__ == "__main__":
+    dataset = load_dataset_normalized(
+        json_file=str(THIS_DIR / "data" / "sample_data.json"),
+        as_sequence=False,
+        augment=True,
+    )
+    train_dataset, val_dataset = split_dataset(dataset, val_ratio=0.2)
+    train_loader, val_loader = get_loaders(
+        train_dataset, val_dataset, batch_size=16)
+
+    for x_batch, y_batch in train_loader:
+        print("Batch X shape:", x_batch.shape)
+        print("Batch y shape:", y_batch.shape)
+        break
