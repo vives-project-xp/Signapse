@@ -1,0 +1,60 @@
+name: Build and Push Server Image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "server/**"
+      - "notebooks/package/**"
+      - ".github/workflows/server.build.yaml"
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract version from pyproject.toml
+        id: version
+        run: |
+          VERSION=$(grep -oP '(?<=version = ")[^"]*' server/pyproject.toml | head -n 1)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Generate image tags
+        id: tags
+        run: |
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          VERSION=${{ steps.version.outputs.version }}
+          REGISTRY="ghcr.io"
+
+          echo "short_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "registry=$REGISTRY" >> $GITHUB_OUTPUT
+          echo "image_base=$REGISTRY/vives-project-xp/signapse/server" >> $GITHUB_OUTPUT
+
+          # Create tags: version, version-sha, latest
+          TAGS="$REGISTRY/vives-project-xp/signapse/server:$VERSION"
+          TAGS="$TAGS,$REGISTRY/vives-project-xp/signapse/server:$VERSION-$SHORT_SHA"
+          TAGS="$TAGS,$REGISTRY/vives-project-xp/signapse/server:latest"
+
+          echo "tags=$TAGS" >> $GITHUB_OUTPUT
+          echo "Tags: $TAGS"
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./server/Dockerfile
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          cache-from: type=registry,ref=${{ steps.tags.outputs.image_base }}:buildcache
+          cache-to: type=registry,ref=${{ steps.tags.outputs.image_base }}:buildcache,mode=max
+          network: host
+
+      - name: Image digest
+        run: echo "Image pushed with tags - ${{ steps.tags.outputs.tags }}"
