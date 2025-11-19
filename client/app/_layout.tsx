@@ -1,5 +1,6 @@
 import "../assets/styles/globals.css";
 import { ThemeProvider, useTheme } from "@/lib/theme";
+import { AppSettingsProvider } from "@/lib/app-settings";
 
 import { Stack } from "expo-router";
 
@@ -29,8 +30,10 @@ function RootStack() {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <RootStack />
-    </ThemeProvider>
+    <AppSettingsProvider>
+      <ThemeProvider>
+        <RootStack />
+      </ThemeProvider>
+    </AppSettingsProvider>
   );
 }

@@ -5,10 +5,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage"; // <-- Add
 import { BASE_URL } from "@/lib/const";
 import api from "@/lib/api";
 import { useTheme } from "@/lib/theme";
+import { useAppSettings } from "@/lib/app-settings";
 
 export default function Settings() {
   const [apiVersion, setApiVersion] = useState("-");
   const { preference, setPreference, colors } = useTheme();
+  const { aiModel, setAiModel } = useAppSettings();
 
   useEffect(() => {
     // Fetch API version from the backend
@@ -36,14 +38,15 @@ export default function Settings() {
   }) {
     const storageKey = `setting_${item.key}`; // Unique key per setting
     const isThemeSetting = item.key === "THEME";
+    const isAiSetting = item.key === "AI_VERSION";
     const [selected, setSelected] = useState(
-      isThemeSetting ? preference : item.options?.[0]?.value ?? ""
+      isThemeSetting ? preference : isAiSetting ? aiModel : item.options?.[0]?.value ?? ""
     );
     const selectedOption = item.options?.find((o) => o.value === selected);
 
     // Load saved value on mount
     useEffect(() => {
-      if (!item.options || isThemeSetting) {
+      if (!item.options || isThemeSetting || isAiSetting) {
         return;
       }
       const loadValue = async () => {
@@ -59,13 +62,19 @@ export default function Settings() {
       if (item.options) {
         loadValue();
       }
-    }, [storageKey, item.options, isThemeSetting]);
+    }, [storageKey, item.options, isThemeSetting, isAiSetting]);
 
     useEffect(() => {
       if (isThemeSetting && preference !== selected) {
         setSelected(preference);
       }
     }, [isThemeSetting, preference, selected]);
+
+    useEffect(() => {
+      if (isAiSetting && aiModel !== selected) {
+        setSelected(aiModel);
+      }
+    }, [isAiSetting, aiModel, selected]);
 
     // Save value when changed
     const handleChange = async (value: string) => {
@@ -75,6 +84,13 @@ export default function Settings() {
         (value === "light" || value === "dark" || value === "system")
       ) {
         setPreference(value as "light" | "dark" | "system");
+        return;
+      }
+      if (
+        isAiSetting &&
+        (value === "VGT" || value === "ASL" || value === "LSTM")
+      ) {
+        setAiModel(value as "VGT" | "ASL" | "LSTM");
         return;
       }
       try {

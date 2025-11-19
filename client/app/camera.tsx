@@ -2,6 +2,7 @@ import { Button } from "@/components/Button";
 import { LandmarksOverlay } from "@/components/LandmarksOverlay";
 import api, { HttpError, NetworkError } from "@/lib/api";
 import { useTheme } from "@/lib/theme";
+import { useAppSettings } from "@/lib/app-settings";
 import { useWordBuilder } from "@/lib/useWordBuilder";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import { router } from "expo-router";
@@ -21,6 +22,7 @@ export default function CameraScreen() {
 
   const cameraRef = useRef<CameraView>(null);
   const { colors } = useTheme();
+  const { alphabetModel } = useAppSettings();
 
   // Word builder hook with optimized settings for sign language
   const { currentWord, letterBuffer, addLetter, clearWord, deleteLastLetter, commitBuffer } =
@@ -32,17 +34,35 @@ export default function CameraScreen() {
 
   // Request permission and load classes on mount
   useEffect(() => {
-    if (!permission?.granted) requestPermission();
+    if (!permission?.granted) {
+      requestPermission();
+      return;
+    }
+    if (!alphabetModel) {
+      setClasses([]);
+      return;
+    }
+
+    let cancelled = false;
+    setClasses([]);
 
     api
-      .classes("vgt")
-      .then((resp) => setClasses(resp.classes || []))
+      .classes(alphabetModel)
+      .then((resp) => {
+        if (!cancelled) {
+          setClasses(resp.classes || []);
+        }
+      })
       .catch(console.warn);
-  }, [permission?.granted, requestPermission]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [permission?.granted, requestPermission, alphabetModel]);
 
   // Capture and process images
   const capture = async () => {
-    if (!cameraRef.current || !permission?.granted) return;
+    if (!cameraRef.current || !permission?.granted || !alphabetModel) return;
 
     try {
       const cam = cameraRef.current;
@@ -75,7 +95,7 @@ export default function CameraScreen() {
 
       if (detectedLandmarks.length === 21) {
         setLandmarks(detectedLandmarks);
-        const result = await api.predict("vgt", detectedLandmarks);
+        const result = await api.predict(alphabetModel, detectedLandmarks);
         const index = Number(result?.prediction);
         const detectedLetter =
           !isNaN(index) && classes[index] ? classes[index] : result?.prediction || null;
@@ -111,12 +131,12 @@ export default function CameraScreen() {
 
   // Auto-capture loop
   useEffect(() => {
-    if (!permission?.granted) return;
+    if (!permission?.granted || !alphabetModel) return;
 
     const interval = setInterval(capture, CAPTURE_INTERVAL);
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [permission?.granted, classes]);
+  }, [permission?.granted, alphabetModel]);
 
   if (!permission) {
     return (
@@ -176,6 +196,21 @@ export default function CameraScreen() {
         className="absolute inset-x-0 bottom-4 px-4 sm:bottom-6 sm:px-6 md:bottom-8 md:px-8"
       >
         <View className="w-full px-4 sm:px-6 md:px-8">
+          {!alphabetModel && (
+            <View
+              className="mb-3 w-full max-w-2xl self-center rounded-xl border px-4 py-3"
+              style={{ borderColor: colors.border, backgroundColor: colors.card }}
+            >
+              <Text
+                className="text-center text-sm font-medium"
+                style={{ color: colors.text }}
+              >
+                Het gekozen LSTM-model wordt nog niet ondersteund door de API. Kies voorlopig ASL
+                of VGT voor live detectie.
+              </Text>
+            </View>
+          )}
+
           {/* Current Word Display */}
           <View
             className="mb-3 min-h-28 w-full max-w-2xl self-center rounded-xl border px-4 py-3 md:min-h-32"
