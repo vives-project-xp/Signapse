@@ -1,5 +1,5 @@
 import { type VariantProps, cva } from 'class-variance-authority';
-import { Text, TouchableOpacity } from 'react-native';
+import { Text, TouchableOpacity, type StyleProp, type TextStyle } from 'react-native';
 
 import { cn } from '../lib/utils';
 
@@ -53,10 +53,12 @@ interface ButtonProps
     VariantProps<typeof buttonVariants> {
   label: string;
   labelClasses?: string;
+  labelStyle?: StyleProp<TextStyle>;
 }
 function Button({
   label,
   labelClasses,
+  labelStyle,
   className,
   variant,
   size,
@@ -71,6 +73,7 @@ function Button({
         className={cn(
           buttonTextVariants({ variant, size, className: labelClasses })
         )}
+        style={labelStyle}
       >
         {label}
       </Text>
