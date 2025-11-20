@@ -19,7 +19,7 @@ export default function Index() {
     <View className="flex-1 bg-[#F2F2F2] justify-center items-center px-6 sm:px-8 md:px-12">
       <View className="w-full max-w-[640px] items-center">
         <Image
-          source={require('../assets/images/Handsymbol.png')}
+          source={require('../assets/images/icon.png')}
           resizeMode="contain"
           className="w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 max-w-[128px] max-h-[128px]"
         />

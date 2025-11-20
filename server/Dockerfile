@@ -12,11 +12,11 @@ RUN apt-get update  && \
         && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip install -q -r requirements.txt
+RUN pip install -r requirements.txt -q --no-cache-dir
 
 COPY ./notebooks/package /package
 
-RUN pip install -e /package
+RUN pip install -e /package -q --no-cache-dir
 
 COPY ./server .
 
