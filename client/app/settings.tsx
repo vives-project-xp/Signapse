@@ -1,12 +1,17 @@
 import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
 import { FlatList, Image, Linking, Pressable, Text, View } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // <-- Add this
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BASE_URL } from "@/lib/const";
 import api from "@/lib/api";
+import { useTheme } from "@/lib/theme";
+import { useAppSettings } from "@/lib/app-settings";
 
 export default function Settings() {
   const [apiVersion, setApiVersion] = useState("-");
+  const { preference, setPreference, colors, colorScheme } = useTheme();
+  const { aiModel, setAiModel } = useAppSettings();
+  const pickerTextColor = colorScheme === "dark" ? "#f8fafc" : colors.text;
 
   useEffect(() => {
     // Fetch API version from the backend
@@ -33,11 +38,18 @@ export default function Settings() {
     };
   }) {
     const storageKey = `setting_${item.key}`; // Unique key per setting
-    const [selected, setSelected] = useState(item.options?.[0]?.value ?? "");
+    const isThemeSetting = item.key === "THEME";
+    const isAiSetting = item.key === "AI_VERSION";
+    const [selected, setSelected] = useState(
+      isThemeSetting ? preference : isAiSetting ? aiModel : item.options?.[0]?.value ?? ""
+    );
     const selectedOption = item.options?.find((o) => o.value === selected);
 
     // Load saved value on mount
     useEffect(() => {
+      if (!item.options || isThemeSetting || isAiSetting) {
+        return;
+      }
       const loadValue = async () => {
         try {
           const saved = await AsyncStorage.getItem(storageKey);
@@ -51,11 +63,37 @@ export default function Settings() {
       if (item.options) {
         loadValue();
       }
-    }, [storageKey, item.options]);
+    }, [storageKey, item.options, isThemeSetting, isAiSetting]);
+
+    useEffect(() => {
+      if (isThemeSetting && preference !== selected) {
+        setSelected(preference);
+      }
+    }, [isThemeSetting, preference, selected]);
+
+    useEffect(() => {
+      if (isAiSetting && aiModel !== selected) {
+        setSelected(aiModel);
+      }
+    }, [isAiSetting, aiModel, selected]);
 
     // Save value when changed
     const handleChange = async (value: string) => {
       setSelected(value);
+      if (
+        isThemeSetting &&
+        (value === "light" || value === "dark" || value === "system")
+      ) {
+        setPreference(value as "light" | "dark" | "system");
+        return;
+      }
+      if (
+        isAiSetting &&
+        (value === "VGT" || value === "ASL" || value === "LSTM")
+      ) {
+        setAiModel(value as "VGT" | "ASL" | "LSTM");
+        return;
+      }
       try {
         await AsyncStorage.setItem(storageKey, value);
       } catch (error) {
@@ -64,8 +102,16 @@ export default function Settings() {
     };
 
     return (
-      <View className="mb-3 w-full  rounded-xl bg-white p-4 shadow-sm">
-        <Text className="mb-2 text-center text-lg font-semibold text-gray-800">{item.title}</Text>
+      <View
+        className="mb-3 w-full rounded-xl p-4 shadow-sm"
+        style={{ backgroundColor: colors.card }}
+      >
+        <Text
+          className="mb-2 text-center text-lg font-semibold"
+          style={{ color: colors.text }}
+        >
+          {item.title}
+        </Text>
 
         {/* Members */}
         {item.members ? (
@@ -75,9 +121,14 @@ export default function Settings() {
                 {m.image ? (
                   <Image source={{ uri: m.image }} className="mb-2 h-16 w-16 rounded-full" />
                 ) : (
-                  <View className="mb-2 h-16 w-16 rounded-full bg-gray-200" />
+                  <View
+                    className="mb-2 h-16 w-16 rounded-full"
+                    style={{ backgroundColor: colors.memberPlaceholder }}
+                  />
                 )}
-                <Text className=" text-xs text-gray-700">{m.name}</Text>
+                <Text className="text-xs" style={{ color: colors.textMuted }}>
+                  {m.name}
+                </Text>
               </View>
             ))}
           </View>
@@ -85,25 +136,44 @@ export default function Settings() {
 
         {/* Content */}
         {item.content ? (
-          <Text className="mt-3 text-sm leading-6 text-gray-600">{item.content}</Text>
+          <Text
+            className="mt-3 text-sm leading-6"
+            style={{ color: colors.textMuted }}
+          >
+            {item.content}
+          </Text>
         ) : null}
 
         {/* Picker with persistence */}
         {item.options ? (
           <View className="mt-4">
-            <View className="rounded-md border border-gray-200 bg-white">
+            <View
+              className="rounded-md border"
+              style={{
+                borderColor: colors.border,
+                backgroundColor: colors.pickerBackground,
+              }}
+            >
               <Picker
                 selectedValue={selected}
                 onValueChange={handleChange}
                 mode="dropdown"
-                //style={{ width: 160 }} // optioneel, bepaalt minimumbreedte
+                dropdownIconColor={pickerTextColor}
+                style={{
+                  color: pickerTextColor,
+                  backgroundColor: colors.pickerBackground,
+                }}
+                itemStyle={{
+                  color: pickerTextColor,
+                  backgroundColor: colors.pickerBackground,
+                }}
               >
                 {item.options.map((opt) => (
                   <Picker.Item
                     key={opt.value}
                     label={opt.label}
                     value={opt.value}
-                    color={"black"}
+                    color={pickerTextColor}
                   />
                 ))}
               </Picker>
@@ -113,7 +183,10 @@ export default function Settings() {
 
         {/* Show description of the selected option */}
         {selectedOption?.description ? (
-          <Text className="background-white mt-2 text-sm text-gray-600">
+          <Text
+            className="background-white mt-2 text-sm"
+            style={{ color: colors.textMuted }}
+          >
             {selectedOption.description}
           </Text>
         ) : null}
@@ -123,9 +196,15 @@ export default function Settings() {
           <Pressable
             onPress={() => item.link && Linking.openURL(item.link)}
             accessibilityRole="link"
-            className="mt-4 rounded-md bg-blue-600 px-4 py-2 shadow-sm"
+            className="mt-4 rounded-md px-4 py-2 shadow-sm"
+            style={{ backgroundColor: colors.buttonBackground }}
           >
-            <Text className="font-medium text-white">Open link</Text>
+            <Text
+              className="font-medium"
+              style={{ color: colors.buttonText }}
+            >
+              Open link
+            </Text>
           </Pressable>
         ) : null}
       </View>
@@ -178,7 +257,10 @@ export default function Settings() {
   ];
 
   return (
-    <View className="flex-1 items-center  bg-[#F2F2F2] ">
+    <View
+      className="flex-1 items-center"
+      style={{ backgroundColor: colors.background }}
+    >
       {/* Centrale container met max breedte */}
       <View className="w-full max-w-[640px] flex-1">
         <FlatList

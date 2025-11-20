@@ -1,8 +1,10 @@
+import { useTheme } from "@/lib/theme";
 import { router } from "expo-router";
 import { FlatList, Image, Linking, Pressable, Text, View } from "react-native";
 import React from "react";
 
 export default function About() {
+  const { colors } = useTheme();
   const handleback = () => {
     router.push("/");
   };
@@ -20,9 +22,15 @@ export default function About() {
     };
   }) {
     return (
-      <View className="mb-3 w-full rounded-xl bg-white p-4 shadow-sm">
+      <View
+        className="mb-3 w-full rounded-xl p-4 shadow-sm"
+        style={{ backgroundColor: colors.card }}
+      >
         {/* Titel */}
-        <Text className="mb-2 text-center text-lg font-semibold text-gray-800">
+        <Text
+          className="mb-2 text-center text-lg font-semibold"
+          style={{ color: colors.text }}
+        >
           {item.title}
         </Text>
 
@@ -37,9 +45,14 @@ export default function About() {
                     className="mb-2 h-16 w-16 rounded-full"
                   />
                 ) : (
-                  <View className="mb-2 h-16 w-16 rounded-full bg-gray-200" />
+                  <View
+                    className="mb-2 h-16 w-16 rounded-full"
+                    style={{ backgroundColor: colors.memberPlaceholder }}
+                  />
                 )}
-                <Text className="text-xs text-gray-700">{m.name}</Text>
+                <Text className="text-xs" style={{ color: colors.textMuted }}>
+                  {m.name}
+                </Text>
               </View>
             ))}
           </View>
@@ -47,7 +60,10 @@ export default function About() {
 
         {/* Tekst / inhoud */}
         {item.content ? (
-          <Text className="mt-3 text-sm leading-6 text-gray-600">
+          <Text
+            className="mt-3 text-sm leading-6"
+            style={{ color: colors.textMuted }}
+          >
             {item.content}
           </Text>
         ) : null}
@@ -57,9 +73,15 @@ export default function About() {
           <Pressable
             onPress={() => item.link && Linking.openURL(item.link)}
             accessibilityRole="link"
-            className="mt-4 rounded-md bg-blue-600 px-4 py-2 shadow-sm"
+            className="mt-4 rounded-md px-4 py-2 shadow-sm"
+            style={{ backgroundColor: colors.buttonBackground }}
           >
-            <Text className="text-center font-medium text-white">Open link</Text>
+            <Text
+              className="text-center font-medium"
+              style={{ color: colors.buttonText }}
+            >
+              Open link
+            </Text>
           </Pressable>
         ) : null}
       </View>
@@ -123,7 +145,10 @@ export default function About() {
   ];
 
   return (
-    <View className="flex-1 bg-[#F2F2F2] items-center">
+    <View
+      className="flex-1 items-center"
+      style={{ backgroundColor: colors.background }}
+    >
       {/* Centrale container met max breedte */}
       <View className="w-full max-w-[640px] flex-1">
         <FlatList
