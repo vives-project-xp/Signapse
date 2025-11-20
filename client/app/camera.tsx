@@ -205,8 +205,7 @@ export default function CameraScreen() {
                 className="text-center text-sm font-medium"
                 style={{ color: colors.text }}
               >
-                Het gekozen LSTM-model wordt nog niet ondersteund door de API. Kies voorlopig ASL
-                of VGT voor live detectie.
+                Het gekozen LSTM-model wordt nog niet ondersteund door de API.
               </Text>
             </View>
           )}

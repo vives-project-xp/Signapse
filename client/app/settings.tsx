@@ -1,7 +1,7 @@
 import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
 import { FlatList, Image, Linking, Pressable, Text, View } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // <-- Add this
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BASE_URL } from "@/lib/const";
 import api from "@/lib/api";
 import { useTheme } from "@/lib/theme";
@@ -9,8 +9,9 @@ import { useAppSettings } from "@/lib/app-settings";
 
 export default function Settings() {
   const [apiVersion, setApiVersion] = useState("-");
-  const { preference, setPreference, colors } = useTheme();
+  const { preference, setPreference, colors, colorScheme } = useTheme();
   const { aiModel, setAiModel } = useAppSettings();
+  const pickerTextColor = colorScheme === "dark" ? "#f8fafc" : colors.text;
 
   useEffect(() => {
     // Fetch API version from the backend
@@ -157,14 +158,22 @@ export default function Settings() {
                 selectedValue={selected}
                 onValueChange={handleChange}
                 mode="dropdown"
-                //style={{ width: 160 }} // optioneel, bepaalt minimumbreedte
+                dropdownIconColor={pickerTextColor}
+                style={{
+                  color: pickerTextColor,
+                  backgroundColor: colors.pickerBackground,
+                }}
+                itemStyle={{
+                  color: pickerTextColor,
+                  backgroundColor: colors.pickerBackground,
+                }}
               >
                 {item.options.map((opt) => (
                   <Picker.Item
                     key={opt.value}
                     label={opt.label}
                     value={opt.value}
-                    color={colors.text}
+                    color={pickerTextColor}
                   />
                 ))}
               </Picker>
