@@ -64,7 +64,7 @@ const palettes: Record<"light" | "dark", ThemeColors> = {
     memberPlaceholder: "#1f1f1f",
     buttonBackground: "#3b82f6",
     buttonText: "#ffffff",
-    headerBackground: "#181818",
+    headerBackground: "#1f1f1f",
     headerText: "#f3f4f6",
   },
 };

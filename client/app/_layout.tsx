@@ -22,8 +22,8 @@ function RootStack() {
     >
       <Stack.Screen name="index" options={{ title: "Welkom", headerShown: false  } } />
       <Stack.Screen name="camera" options={{ title: "Cameraweergave", headerShown: false  }} />
-      <Stack.Screen name="about" options={{ title: "Over", headerShown: true  }} />
-      <Stack.Screen name="settings" options={{ title: "Instellingen", headerShown: true  }} />
+      <Stack.Screen name="about" options={{ title: "Over", headerShown: true, headerShadowVisible: false  }} />
+      <Stack.Screen name="settings" options={{ title: "Instellingen", headerShown: true, headerShadowVisible: false   }} />
     </Stack>
   );
 }

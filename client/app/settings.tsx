@@ -153,7 +153,7 @@ export default function Settings() {
               />
             </View>
 
-                  {/* test toggle */}
+            {/* test toggle */}
             <View className="mt-3 flex-row items-center gap-3">
               <Text className="text-sm" style={{ color: colors.text }}>
                 Precision
@@ -285,7 +285,7 @@ export default function Settings() {
     },
     {
       key: "apistuff",
-      title: "API URL",
+      title: "Developer options",
       content: `Server URL: ${BASE_URL}\nServer versie: v${apiVersion}`,
     },
   ];

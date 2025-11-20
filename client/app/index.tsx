@@ -4,7 +4,11 @@ import { router } from "expo-router";
 import { Image, Text, View } from "react-native";
 
 export default function Index() {
-  const { colors } = useTheme();
+  const { colors, colorScheme } = useTheme();
+  const logoSource =
+    colorScheme === "dark"
+      ? require("../assets/images/icon2.png")
+      : require("../assets/images/icon.png");
 
   const handleGetStarted = () => {
     router.push("/camera");
@@ -25,7 +29,7 @@ export default function Index() {
     >
       <View className="w-full max-w-[640px] items-center">
         <Image
-          source={require('../assets/images/icon.png')}
+          source={logoSource}
           resizeMode="contain"
           className="w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 max-w-[128px] max-h-[128px]"
         />

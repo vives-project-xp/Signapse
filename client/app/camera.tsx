@@ -199,20 +199,6 @@ export default function CameraScreen() {
         className="absolute inset-x-0 bottom-4 px-4 sm:bottom-6 sm:px-6 md:bottom-8 md:px-8"
       >
         <View className="w-full px-4 sm:px-6 md:px-8">
-          {!alphabetModel && (
-            <View
-              className="mb-3 w-full max-w-2xl self-center rounded-xl border px-4 py-3"
-              style={{ borderColor: colors.border, backgroundColor: colors.card }}
-            >
-              <Text
-                className="text-center text-sm font-medium"
-                style={{ color: colors.text }}
-              >
-                Het gekozen LSTM-model wordt nog niet ondersteund door de API.
-              </Text>
-            </View>
-          )}
-
           {/* Combined Word + Current Letter */}
           <View
             className="mb-3 w-full max-w-2xl self-center rounded-xl border px-4 py-3"
