@@ -83,3 +83,4 @@ notebook==7.0.0
 gradio==5.42.0
 transformers==4.44.2
 python-dotenv==1.0.1
+mouse==0.7.1

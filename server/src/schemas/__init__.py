@@ -1,7 +1,7 @@
-from .status import StatusResponse
 from .classes import ClassesResponse
-from .predict import PredictBody, PredictResponse
 from .keypoints import KeypointsResponse
+from .predict import PredictBody, PredictResponse
+from .status import StatusResponse
 
 __all__ = [
     "StatusResponse",

@@ -5,6 +5,5 @@
     "./notebooks/package"
   ],
   // Optional: silence some type checking noise
-  "python.analysis.typeCheckingMode": "basic",
-  "postman.settings.dotenv-detection-notification-visibility": false
+  "python.analysis.typeCheckingMode": "basic"
 }

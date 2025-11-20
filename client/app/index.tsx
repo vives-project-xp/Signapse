@@ -19,14 +19,14 @@ export default function Index() {
     <View className="flex-1 bg-[#F2F2F2] justify-center items-center px-6 sm:px-8 md:px-12">
       <View className="w-full max-w-[640px] items-center">
         <Image
-          source={require('../assets/images/Handsymbol.png')}
+          source={require('../assets/images/icon.png')}
           resizeMode="contain"
-          className="w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 max-w-[128px] max-h-[128px]" 
+          className="w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 max-w-[128px] max-h-[128px]"
         />
 
         <Text className="mt-4 text-3xl md:text-4xl lg:text-5xl font-bold text-[#333333] text-center">Signapse</Text>
         <Text className="mt-2 text-base md:tesxt-lg text-[#666666] text-center leading-6">
-          gebaren naar tekst & spraak
+          Gebaren naar tekst & spraak
         </Text>
 
         <View className="mt-6 w-full">

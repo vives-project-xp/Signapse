@@ -136,7 +136,7 @@ export default function Settings() {
     {
       key: "main",
       title: "App instellingen",
-      content: "configureer je voorkeuren hieronder.",
+      content: "Configureer je voorkeuren hieronder.",
     },
     {
       key: "AI_VERSION",
@@ -173,7 +173,7 @@ export default function Settings() {
     {
       key: "apistuff",
       title: "API URL",
-      content: `URL: ${BASE_URL}\nbackend versie: v${apiVersion}`,
+      content: `Server URL: ${BASE_URL}\nServer versie: v${apiVersion}`,
     },
   ];
 

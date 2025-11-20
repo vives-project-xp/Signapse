@@ -1,8 +1,8 @@
 from typing import List
 
-from fastapi import APIRouter, UploadFile, File, HTTPException
-import numpy as np
 import cv2 as cv
+import numpy as np
+from fastapi import APIRouter, File, HTTPException, UploadFile
 from mediapipe.python.solutions import hands as mp_hands
 
 from const import FastAPITags, Landmark
@@ -45,7 +45,10 @@ async def extract_keypoints(
 
     # check if image decoding was successful
     if img is None:
-        raise HTTPException(status_code=400, detail="Invalid image file or unsupported format")
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid image file or unsupported format",
+        )
 
     # convert BGR to RGB for mediapipe
     img_rgb = cv.cvtColor(img, cv.COLOR_BGR2RGB)
@@ -61,7 +64,7 @@ async def extract_keypoints(
     landmarks: List[Landmark] = []
     for lm in hand_landmarks.landmark:  # type: ignore
         # lm.x, lm.y, lm.z are normalized to [0,1] (z is relative)
-        landmarks.append(Landmark(x=float(lm.x), y=float(lm.y), z=float(lm.z)))  # type: ignore
+        landmarks.append(Landmark(x=float(lm.x), y=float(lm.y), z=float(lm.z)))
 
     return KeypointsResponse(landmarks=landmarks)
 
