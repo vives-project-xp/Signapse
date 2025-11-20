@@ -20,10 +20,10 @@ function RootStack() {
         headerTintColor: colors.headerText,
       }}
     >
-      <Stack.Screen name="index" options={{ title: "Welcome", headerShown: false  } } />
-      <Stack.Screen name="camera" options={{ title: "Camera View", headerShown: false  }} />
-      <Stack.Screen name="about" options={{ title: "About", headerShown: true  }} />
-      <Stack.Screen name="settings" options={{ title: "Settings", headerShown: true  }} />
+      <Stack.Screen name="index" options={{ title: "Welkom", headerShown: false  } } />
+      <Stack.Screen name="camera" options={{ title: "Cameraweergave", headerShown: false  }} />
+      <Stack.Screen name="about" options={{ title: "Over", headerShown: true  }} />
+      <Stack.Screen name="settings" options={{ title: "Instellingen", headerShown: true  }} />
     </Stack>
   );
 }

@@ -1,5 +1,6 @@
-from const import FastAPITags
 from fastapi import APIRouter
+
+from const import FastAPITags
 
 from . import connection
 

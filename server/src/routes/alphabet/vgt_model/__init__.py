@@ -1,10 +1,8 @@
 from fastapi import APIRouter, HTTPException
+from smart_gestures.alphabet.vgt_model import VGTModel, get_classes
 
 from const import FastAPITags
-
 from schemas import ClassesResponse, PredictBody, PredictResponse
-
-from smart_gestures.alphabet.vgt_model import get_classes, VGTModel
 
 classes = get_classes()
 

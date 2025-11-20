@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "smartglasses",
-    "slug": "smartglasses",
+    "name": "signapse",
+    "slug": "signapse",
     "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
@@ -11,28 +11,27 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSCameraUsageDescription": "This app uses the camera to display what you see through your smart glasses."
+        "NSCameraUsageDescription": "deze app gebruikt de camera om de signs te kunnen vertalen."
       },
-      "bundleIdentifier": "com.anonymous.smartglasses"
+      "bundleIdentifier": "com.anonymous.signapse"
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/icon.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "CAMERA",
-        "android.permission.CAMERA"
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.anonymous.smartglasses"
+      "package": "com.anonymous.signapse"
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png",
+      "favicon": "./assets/images/icon.png",
       "bundler": "metro"
     },
     "plugins": [
@@ -41,7 +40,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
@@ -59,8 +58,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "9a5cd697-988c-4558-b5cb-ce064980e88c"
+        "projectId": "16994b1b-4318-4b85-afe0-2f2f06de8df5"
       }
-    }
+    },
+    "owner": "kyell182"
   }
 }

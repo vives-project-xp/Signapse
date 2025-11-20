@@ -1,34 +1,19 @@
-"""vgt_model package
+"""
+VGT Model Subpackage
 
-This package contains code and models for the VGT-based gesture recognition.
+This package contains a high level interface for performing predictions using
+a pre-trained Vlaams Gebaren Taal (VGT) alphabet model.
+
+Available Components:
+- VGTModel: A class that encapsulates the VGT alphabet model and its utilities.
+- get_classes: Function to load the classes used by the model.
 """
 
-from .data_utils import (
-    get_classes,
-    get_loaders,
-)
-from .model_utils import (
-    VGTModel,
-    save_model,
-    create_model,
-    load_model,
-    DEVICE,
-    MODEL_DIR,
-)
-from .train_utils import (
-    train_model,
-    evaluate_model,
-)
+# Import necessary components
+from .model import VGTModel, get_classes
 
+# Define the public API of the package
 __all__ = [
-    "get_classes",
-    "get_loaders",
     "VGTModel",
-    "save_model",
-    "create_model",
-    "load_model",
-    "DEVICE",
-    "MODEL_DIR",
-    "train_model",
-    "evaluate_model", 
+    "get_classes",
 ]

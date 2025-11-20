@@ -5,20 +5,10 @@ import torch
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import ReduceLROnPlateau, StepLR, CosineAnnealingLR
 
-from .model_utils import MODEL_DIR
+from model_utils import *
 
 
 class EarlyStopping:
-    """
-    Early stopping utility.
-
-    Args:
-        patience: epochs to wait without improvement before stopping
-        min_delta: minimum change to qualify as an improvement
-        mode: 'min' (lower is better) or 'max' (higher is better)
-        restore_best_weights: if True, restores model weights from the epoch with the best metric
-    """
-
     def __init__(
         self,
         patience: int = 5,
@@ -46,9 +36,6 @@ class EarlyStopping:
             return (value - self.best) > self.min_delta
 
     def step(self, metric_value: float, model: Optional[torch.nn.Module] = None) -> bool:
-        """Update early stopping state with a new metric value.
-        Returns True if training should stop.
-        """
         if self._is_improvement(metric_value):
             self.best = metric_value
             self.num_bad_epochs = 0
@@ -65,16 +52,6 @@ class EarlyStopping:
 
 
 class ModelCheckpoint:
-    """
-    Save model checkpoints during training.
-
-    Args:
-        filepath: filename for checkpoint (will be placed inside MODEL_DIR if relative)
-        monitor: metric name (for bookkeeping)
-        mode: 'min' or 'max' for comparison if save_best_only
-        save_best_only: if True, only save when monitored metric improves
-    """
-
     def __init__(
         self,
         filepath: str = "best.ckpt",
@@ -130,14 +107,6 @@ def create_scheduler(
     scheduler_type: Optional[str] = None,
     **kwargs,
 ):
-    """
-    Factory for common learning rate schedulers.
-
-    Args:
-        optimizer: Optimizer to schedule
-        scheduler_type: one of None, 'plateau', 'step', 'cosine'
-        kwargs: params specific to the scheduler
-    """
     if scheduler_type is None or scheduler_type == "none":
         return None
     st = scheduler_type.lower()

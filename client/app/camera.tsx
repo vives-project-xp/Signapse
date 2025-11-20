@@ -140,40 +140,18 @@ export default function CameraScreen() {
 
   if (!permission) {
     return (
-      <View
-        className="flex-1 items-center justify-center p-6"
-        style={{ backgroundColor: colors.background }}
-      >
-        <Text className="mb-4 text-center" style={{ color: colors.text }}>
-          Loading camera...
-        </Text>
+      <View className="flex-1 items-center justify-center p-6">
+        <Text className="mb-4 text-center">Loading camera...</Text>
       </View>
     );
   }
 
   if (!permission || !permission.granted) {
     return (
-      <View
-        className="flex-1 items-center justify-center p-6"
-        style={{ backgroundColor: colors.background }}
-      >
-        <Text className="mb-4 text-center" style={{ color: colors.text }}>
-          Camera permission is required
-        </Text>
-        <Button
-          onPress={requestPermission}
-          label="Grant permission"
-          className="mt-2 rounded-lg"
-          style={{ backgroundColor: colors.buttonBackground }}
-          labelStyle={{ color: colors.buttonText }}
-        />
-        <Button
-          onPress={() => router.push("/")}
-          label="Back"
-          className="mt-2 rounded-lg"
-          style={{ backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1 }}
-          labelStyle={{ color: colors.text }}
-        />
+      <View className="flex-1 items-center justify-center p-6">
+        <Text className="mb-4 text-center">Camera permission is required</Text>
+        <Button onPress={requestPermission} label="Grant permission" />
+        <Button onPress={() => router.push("/")} label="Back" />
       </View>
     );
   }
