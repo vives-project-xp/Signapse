@@ -206,4 +206,6 @@ MigrationBackup/
 # ignored by lakectl local
 notebooks/test/*
 !notebooks/test/.lakefs_ref.yaml
+notebooks/training/lstm_model/dataset/*
+!notebooks/training/lstm_model/dataset/.lakefs_ref.yaml
 # End ignored by lakectl local
