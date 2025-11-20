@@ -57,7 +57,7 @@ class GestureLSTM(nn.Module):
         self.fc = nn.Linear(hidden_size, num_classes)
         self.dropout = nn.Dropout(dropout)
 
-    # CRITICAL FIX: Handles sorting/unsorting internally for robustness
+    # Handles sorting/unsorting internally for robustness
     def forward(self, x: torch.Tensor, sequence_lengths: torch.Tensor) -> torch.Tensor:
         
         # --- 1. Sort the batch by sequence length (Mandatory for packing) ---
