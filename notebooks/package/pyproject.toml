@@ -42,19 +42,17 @@ Repository = "https://github.com/vives-project-xp/SmartGlasses"
 Issues = "https://github.com/vives-project-xp/SmartGlasses/issues"
 
 [tool.setuptools]
-packages = { find = {} }
 include-package-data = true
-
-[tool.setuptools.package.find]
+[tool.setuptools.packages.find]
 where = ["."]
 include = ["smart_gestures*"]
 
-[tool.setuptools.package.data]
+[tool.setuptools.package-data]
 "smart_gestures.alphabet.asl_model" = [
-	"data/*.json",
-	"models/*.pth",
+  "data/*.json",
+  "models/*.pth",
 ]
 "smart_gestures.alphabet.vgt_model" = [
-	"data/*.json",
-	"models/*.pth",
+  "data/*.json",
+  "models/*.pth",
 ]
