@@ -1,6 +1,6 @@
 import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
-import { FlatList, Image, Linking, Pressable, Text, View } from "react-native";
+import { FlatList, Image, Linking, Pressable, Switch, Text, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BASE_URL } from "@/lib/const";
 import api from "@/lib/api";
@@ -10,7 +10,7 @@ import { useAppSettings } from "@/lib/app-settings";
 export default function Settings() {
   const [apiVersion, setApiVersion] = useState("-");
   const { preference, setPreference, colors, colorScheme } = useTheme();
-  const { aiModel, setAiModel } = useAppSettings();
+  const { aiModel, setAiModel, showLandmarksButton, setShowLandmarksButton } = useAppSettings();
   const pickerTextColor = colorScheme === "dark" ? "#f8fafc" : colors.text;
 
   useEffect(() => {
@@ -44,6 +44,10 @@ export default function Settings() {
       isThemeSetting ? preference : isAiSetting ? aiModel : item.options?.[0]?.value ?? ""
     );
     const selectedOption = item.options?.find((o) => o.value === selected);
+
+
+    const [dummyToggle, setDummyToggle] = useState(false); //gwn voor % toggle
+
 
     // Load saved value on mount
     useEffect(() => {
@@ -132,6 +136,36 @@ export default function Settings() {
               </View>
             ))}
           </View>
+        ) : null}
+
+        {/* Landmarks toggle for API card */}
+        {item.key === "apistuff" ? (
+          <>
+            <View className="mt-3 flex-row items-center gap-3">
+              <Text className="text-sm" style={{ color: colors.text }}>
+                Toon Landmarks
+              </Text>
+              <Switch
+                value={showLandmarksButton}
+                onValueChange={setShowLandmarksButton}
+                thumbColor={pickerTextColor}
+                trackColor={{ true: "#4ade80", false: "#9ca3af" }}
+              />
+            </View>
+
+                  {/* test toggle */}
+            <View className="mt-3 flex-row items-center gap-3">
+              <Text className="text-sm" style={{ color: colors.text }}>
+                Precision
+              </Text>
+              <Switch
+                value={dummyToggle}
+                onValueChange={setDummyToggle}
+                thumbColor={pickerTextColor}
+                trackColor={{ true: "#4ade80", false: "#9ca3af" }}
+              />
+            </View>
+         </>
         ) : null}
 
         {/* Content */}

@@ -16,15 +16,19 @@ type SettingsContextType = {
   aiModel: AiModelSetting;
   setAiModel: (model: AiModelSetting) => void;
   alphabetModel: AlphabetModel | null;
+  showLandmarksButton: boolean;
+  setShowLandmarksButton: (value: boolean) => void;
 };
 
 const DEFAULT_AI_MODEL: AiModelSetting = "VGT";
 const AI_MODEL_STORAGE_KEY = "setting_AI_VERSION";
+const SHOW_LANDMARKS_STORAGE_KEY = "setting_SHOW_LANDMARKS_BUTTON";
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export function AppSettingsProvider({ children }: { children: ReactNode }) {
   const [aiModel, setAiModelState] = useState<AiModelSetting>(DEFAULT_AI_MODEL);
+  const [showLandmarksButton, setShowLandmarksButtonState] = useState<boolean>(true);
 
   useEffect(() => {
     (async () => {
@@ -32,6 +36,10 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
         const stored = await AsyncStorage.getItem(AI_MODEL_STORAGE_KEY);
         if (stored === "VGT" || stored === "ASL" || stored === "LSTM") {
           setAiModelState(stored);
+        }
+        const storedToggle = await AsyncStorage.getItem(SHOW_LANDMARKS_STORAGE_KEY);
+        if (storedToggle === "true" || storedToggle === "false") {
+          setShowLandmarksButtonState(storedToggle === "true");
         }
       } catch (error) {
         console.error("Failed to restore AI model preference:", error);
@@ -55,6 +63,15 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
     [persistPreference]
   );
 
+  const setShowLandmarksButton = useCallback(async (value: boolean) => {
+    setShowLandmarksButtonState(value);
+    try {
+      await AsyncStorage.setItem(SHOW_LANDMARKS_STORAGE_KEY, value ? "true" : "false");
+    } catch (error) {
+      console.error("Failed to persist landmarks toggle:", error);
+    }
+  }, []);
+
   const alphabetModel = useMemo<AlphabetModel | null>(() => {
     switch (aiModel) {
       case "ASL":
@@ -71,8 +88,10 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
       aiModel,
       setAiModel,
       alphabetModel,
+      showLandmarksButton,
+      setShowLandmarksButton,
     }),
-    [aiModel, setAiModel, alphabetModel]
+    [aiModel, setAiModel, alphabetModel, showLandmarksButton, setShowLandmarksButton]
   );
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
