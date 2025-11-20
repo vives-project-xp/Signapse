@@ -221,6 +221,7 @@ __marimo__/
 package\smart_gestures\gestures\lstm_model\dataset\*
 package\smart_gestures\gestures\lstm_model\dataset\.lakefs_ref.yaml
 
-training/lstm_model/data/
+training/lstm_model/dataset/*
+training/lstm_model/dataset/.lakefs_ref.yaml
 
 # End ignored by lakectl local
