@@ -1,19 +1,24 @@
+import logging
+import os
+import warnings
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+import routes
 from const import __version__
 from websocket.connection_manager import ConnectionManager
-import routes
-import os
-import logging
-import warnings
 
 # Reduce TensorFlow/absl/glog verbosity to avoid noisy startup logs from
 # MediaPipe / TensorFlow. These environment variables MUST be set before
 # importing any module that may in turn import mediapipe or tensorflow.
-os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")  # 0=INFO, 1=WARNING, 2=ERROR, 3=FATAL
+# 0=INFO, 1=WARNING, 2=ERROR, 3=FATAL
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")
 os.environ.setdefault("GLOG_minloglevel", "3")
-os.environ.setdefault("TF_ENABLE_ONEDNN_OPTS", "0")  # Suppress oneDNN custom operations
-os.environ.setdefault("MEDIAPIPE_DISABLE_GPU", "1")  # Disable GPU to reduce warnings
+# Suppress oneDNN custom operations
+os.environ.setdefault("TF_ENABLE_ONEDNN_OPTS", "0")
+# Disable GPU to reduce warnings
+os.environ.setdefault("MEDIAPIPE_DISABLE_GPU", "1")
 # Suppress all TFLite delegate warnings
 os.environ.setdefault("TF_CPP_VMODULE", "inference_feedback_manager=0")
 

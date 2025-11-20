@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+
 from const import NUM_POINTS, Landmark
 
 
@@ -11,4 +12,7 @@ class PredictBody(BaseModel):
 
 
 class PredictResponse(BaseModel):
-    prediction: str = Field(..., description="Predicted class name", )
+    prediction: str = Field(
+        ...,
+        description="Predicted class name",
+    )

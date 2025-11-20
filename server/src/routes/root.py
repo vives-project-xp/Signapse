@@ -1,9 +1,10 @@
 from typing import cast
-from schemas import StatusResponse
-from const import __version__
+
 from fastapi import APIRouter
-from const import FastAPITags
 from fastapi.responses import RedirectResponse
+
+from const import FastAPITags, __version__
+from schemas import StatusResponse
 
 router = APIRouter(
     tags=[FastAPITags.ROOT],

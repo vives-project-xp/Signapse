@@ -25,22 +25,22 @@ export default function Index() {
     >
       <View className="w-full max-w-[640px] items-center">
         <Image
-          source={require('../assets/images/Handsymbol.png')}
+          source={require('../assets/images/icon.png')}
           resizeMode="contain"
-          className="w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 max-w-[128px] max-h-[128px]" 
+          className="w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 max-w-[128px] max-h-[128px]"
         />
 
         <Text
           className="mt-4 text-3xl md:text-4xl lg:text-5xl font-bold text-center"
           style={{ color: colors.text }}
         >
-          Smartglasses
+          Signapse
         </Text>
         <Text
           className="mt-2 text-base md:tesxt-lg text-center leading-6"
           style={{ color: colors.textMuted }}
         >
-          Gestures to text & speech
+          Gebaren naar tekst & spraak
         </Text>
 
         <View className="mt-6 w-full">
@@ -48,7 +48,7 @@ export default function Index() {
             size="lg"
             className="w-full rounded-lg"
             style={{ backgroundColor: colors.buttonBackground }}
-            label="Start detection"
+            label="Start detectie"
             labelClasses="text-lg font-semibold"
             labelStyle={{ color: colors.buttonText }}
             onPress={handleGetStarted}
@@ -57,7 +57,7 @@ export default function Index() {
 
         <View className="mt-3 w-full flex-col md:flex-row gap-3">
           <Button
-            label="About"
+            label="Over"
             className="w-full md:w-auto md:flex-1 rounded-lg px-10 border-2"
             style={{
               backgroundColor: colors.card,
@@ -70,7 +70,7 @@ export default function Index() {
             variant="secondary"
           />
           <Button
-            label="Settings"
+            label="Instellingen"
             className="w-full md:w-auto md:flex-1 rounded-lg px-10 border-2"
             style={{
               backgroundColor: colors.card,

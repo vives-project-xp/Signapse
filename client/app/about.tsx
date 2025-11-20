@@ -91,24 +91,24 @@ export default function About() {
   const aboutData = [
     {
       key: "about",
-      title: "About the project",
+      title: "Over het project",
       content: "Signapse helpt je om gebarentaal om te zetten naar tekst in real time.\nDe app herkent handbewegingen met de camera en toont meteen wat er bedoeld wordt — zo wordt communiceren makkelijker en sneller.",
     },
     {
       key: "idea",
-      title: "Idea",
+      title: "Idee achter het project",
       content:
         "Het idee achter Singapse is om communicatie tussen dove en horende mensen te vergemakkelijken.\nDoor AI en camerabeelden te combineren, vertaalt de app gebaren automatisch naar tekst.",
     },
     {
       key: "goals",
-      title: "Goals",
+      title: "Doelen",
       content:
         "Onze doelen zijn:\n• Gebaren in real time herkennen\n• Herkende gebaren omzetten naar natuurlijke tekst\n• Een eenvoudige en toegankelijke interface bieden\n• Zowel lokaal als via een server efficiënt werken.",
     },
     {
       key: "features",
-      title: "Core features",
+      title: "Kernfuncties",
       content:
         "• Herkenning van gebaren via de camera\n• AI-model dat gebaren omzet naar tekst\n• Live weergave van herkende woorden en zinnen\n• Geschiedenis van herkende tekst\n• Delen of kopiëren van resultaten",
     },
@@ -116,7 +116,7 @@ export default function About() {
       key: "roadmap",
       title: "Roadmap",
       content:
-        "1. Prototype camera capture\n2. Integrate landmark extraction\n3. Train/test classifier\n4. Hook classifier to app\n5. Improve accuracy & smoothing\n6. Polish UI, add history & settings",
+        "1. Prototype camera opslag\n2. Integreer extractie van oriëntatiepunten\n3. Train/test classifier\n4. Koppel classifier aan app\n5. Verbeter nauwkeurigheid & smoothing\n6. Verfijn UI, voeg geschiedenis & instellingen toe",
     },
     {
       key: "mkdocs",
@@ -127,8 +127,8 @@ export default function About() {
     },
     {
       key: "githubrepo",
-      title: "GitHub Repository",
-      content: "Dit is de main repository voor het project.",
+      title: "GitHub-repository",
+      content: "Dit is de hoofdrepository voor het project.",
       link: "https://github.com/vives-project-xp/SmartGlasses",
     },
     {

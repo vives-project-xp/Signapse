@@ -1,6 +1,7 @@
 import os
 import json
 import numpy as np
+import glob
 import torch
 from torch.utils.data import Dataset, DataLoader, random_split
 from torch.nn.utils.rnn import pad_sequence
@@ -8,7 +9,7 @@ from typing import cast, List, Tuple, Dict
 
 # Constant paths
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(THIS_DIR, "test")
+DATA_DIR = os.path.join(THIS_DIR, "dataset")
 GESTURE_MAP_PATH = os.path.join(THIS_DIR, "gesture_map.json")
 FEATURE_SIZE = 258  # 33 pose * 4 + 21 left hand * 3 + 21 right hand * 3
 
@@ -42,6 +43,13 @@ def get_gesture_map() -> Dict[str, int]:
         gesture_map: Dict[str, int] = json.load(f)
     return gesture_map
 
+# Get the classes from the gesture map
+def get_classes() -> List[str]:
+    gesture_map = get_gesture_map()
+    classes = [""] * len(gesture_map)
+    for name, idx in gesture_map.items():
+        classes[idx] = name
+    return classes
 
 # Function to load dataset and preprocess sequences
 def load_and_preprocess_dataset(
@@ -52,7 +60,8 @@ def load_and_preprocess_dataset(
     try:
         gesture_map = get_gesture_map()
     except FileNotFoundError:
-        raise FileNotFoundError(f"Gesture map file not found at {gesture_map_path}")
+        raise FileNotFoundError(
+            f"Gesture map file not found at {gesture_map_path}")
 
     actions = list(gesture_map.keys())
     sequences: List[np.ndarray] = []
@@ -62,7 +71,8 @@ def load_and_preprocess_dataset(
     for action in actions:
         action_dir = os.path.join(data_path, action)
         if not os.path.isdir(action_dir):
-            print(f"Warning: Action directory '{action_dir}' does not exist, skipping.")
+            print(
+                f"Warning: Action directory '{action_dir}' does not exist, skipping.")
             continue
         seq_folders = sorted(
             [
@@ -75,20 +85,25 @@ def load_and_preprocess_dataset(
 
         for seq_folder in seq_folders:
             seq_path = os.path.join(action_dir, seq_folder)
-            # Find keypoint files (`keypoints_{index}.npy`) and sort by the numeric index
-            keypoint_files = sorted(
-                [
-                    f
-                    for f in os.listdir(seq_path)
-                    if f.startswith("keypoints_") and f.endswith(".npy")
-                ],
-                key=lambda f: int(f.split("_")[-1].split(".")[0]),
-            )
+            print(f"Processing sequence folder: {seq_path}")
+
+            keypoint_pattern = os.path.join(seq_path, "**", "keypoints_*.npy")
+            keypoint_files = glob.glob(keypoint_pattern, recursive=True)
+
+            # Sort by numeric index extracted from filename (keypoints_<index>.npy)
+            def _extract_index(path: str) -> int:
+                base = os.path.basename(path)
+                try:
+                    return int(base.split("_")[-1].split(".")[0])
+                except Exception:
+                    return -1
+
+            keypoint_files = sorted(keypoint_files, key=_extract_index)
 
             window: List[np.ndarray] = []
             # Load each keypoints file for this sequence
             for kf in keypoint_files:
-                kf_path = os.path.join(seq_path, kf)
+                kf_path = kf
                 try:
                     res = np.load(kf_path)
                     if res.shape[0] != feature_size:
@@ -122,15 +137,6 @@ def load_and_preprocess_dataset(
     print(f"Loading complete. Loaded {len(sequences)} sequences.")
     return GestureDataset(sequences, y, classes)
 
-def get_classes() -> List[str]:
-    gesture_map = get_gesture_map()
-    classes = [""] * len(gesture_map)
-    for name, idx in gesture_map.items():
-        classes[idx] = name
-    return classes
-
-classes = get_classes()
-print("Available classes:", classes)
 
 # Function to split dataset into train, val, test
 def split_dataset(
@@ -151,16 +157,11 @@ def split_dataset(
     )
     return train_set, val_set, test_set
 
-# Example usage to load and preprocess dataset
-dataset = load_and_preprocess_dataset()
-print(f"Loaded dataset with {len(dataset)} samples.")
-train_set, val_set, test_set = split_dataset(dataset)
-print(f"Train set: {len(train_set)}, Val set: {len(val_set)}, Test set: {len(test_set)}")
-
 # Collate function for DataLoader
 def collate_fn(batch: List[Tuple[torch.Tensor, torch.Tensor]]) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     sequences, labels = zip(*batch)
-    lengths = torch.tensor([seq.shape[0] for seq in sequences], dtype=torch.long)
+    lengths = torch.tensor([seq.shape[0]
+                           for seq in sequences], dtype=torch.long)
     padded_sequences = pad_sequence(sequences, batch_first=True)
     labels_tensor = torch.stack(labels)
     return padded_sequences, labels_tensor, lengths
@@ -183,6 +184,15 @@ def get_loaders(
     )
     return train_loader, val_loader, test_loader
 
-# Example usage to get DataLoaders
-train_loader, val_loader, test_loader = get_loaders(train_set, val_set, test_set)
-print(f"Train loader batches: {len(train_loader)}, Val loader batches: {len(val_loader)}, Test loader batches: {len(test_loader)}")
+# Example usage fro the functions in the model
+def example_usage():
+    classes = get_classes()
+    print("Classes:", classes)
+    dataset = load_and_preprocess_dataset()
+    print(f"Total sequences loaded: {len(dataset)}")
+    train_set, val_set, test_set = split_dataset(dataset)
+    print(f"Train size: {len(train_set)}, Val size: {len(val_set)}, Test size: {len(test_set)}")
+    train_loader, val_loader, test_loader = get_loaders(train_set, val_set, test_set)
+    print(f"Train loader batches: {len(train_loader)}, Val loader batches: {len(val_loader)}, Test loader batches: {len(test_loader)}")
+# Uncomment to run example usage
+# example_usage()
