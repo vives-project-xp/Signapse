@@ -42,7 +42,7 @@ class GestureLSTM(nn.Module):
     A PyTorch LSTM model designed for sequence classification of sign language gestures.
     Implements internal sorting/unsorting to safely use sequence packing.
     """
-    def __init__(self, in_dim: int, hidden_size: int, num_layers: int, num_classes: int, dropout: float = 0.2):
+    def __init__(self, in_dim: int, hidden_size: int, num_layers: int, num_classes: int, dropout: float = 0.4):
         super(GestureLSTM, self).__init__()
         
         self.lstm = nn.LSTM(

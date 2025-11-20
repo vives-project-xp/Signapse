@@ -6,7 +6,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-# The DataLoader now returns three elements (inputs, labels, lengths)
 from typing import Tuple, List 
 from tqdm import tqdm
 
@@ -14,46 +13,48 @@ from tqdm import tqdm
 from data_utils import *
 from model_utils import *
 
-
-# NOTE: The sort_batch_by_length helper function is removed because
-# the sorting logic is now handled internally by GestureLSTM.forward()
-
-
-# Update DataLoader tuple type to reflect the 3 outputs (X, y, length)
 def train_model(
     model: nn.Module,
-    dataloader: DataLoader[Tuple[torch.Tensor, torch.Tensor, torch.Tensor]], 
+    dataloader: DataLoader, 
     epochs: int = 50,
     lr: float = 1e-3,
+    weight_decay: float = 1e-4
 ):
     """
-    Trains a PyTorch LSTM model for a specified number of epochs, handling padding via packing.
-
-    The model expects input shape (Batch Size, Sequence Length, Features) and sequence lengths.
+    Trains a PyTorch LSTM model for a specified number of epochs.
+    Includes a Learning Rate Scheduler.
     """
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=lr)
-
+    
+    # Optimizer with L2 Regularization (Weight Decay)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+    
+    # SCHEDULER: Reduces LR by a factor of 0.5 if loss doesn't improve for 5 epochs
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode='min', factor=0.5, patience=5, verbose=True
+    )
+    
     for epoch in range(epochs):
         model.train()
         running_loss = 0.0
         total_samples = 0
         
-        # CRITICAL CHANGE 1: Unpack 3 items (inputs, labels, lengths)
         for inputs, labels, lengths in tqdm(dataloader, desc=f"Epoch {epoch+1}/{epochs}"):
             
-            # NOTE: Sorting is now handled inside model_utils.py
-
-            # 2. Move data to device (Note: lengths is kept on CPU/moved by the model internally)
             inputs, labels = inputs.to(DEVICE), labels.to(DEVICE)
 
             optimizer.zero_grad()
             
-            # 3. Pass inputs AND sequence lengths to the model
+            # Pass inputs AND sequence lengths to the model
             outputs = model(inputs, lengths) 
             
             loss = criterion(outputs, labels)
             loss.backward()
+            
+            # Optional: Gradient Clipping (Highly recommended for LSTMs)
+            # Prevents "exploding gradients" which LSTMs are prone to
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            
             optimizer.step()
             
             batch_size = inputs.size(0) 
@@ -61,30 +62,30 @@ def train_model(
             total_samples += batch_size
 
         epoch_loss = running_loss / total_samples if total_samples > 0 else 0.0
-        print(f"Epoch {epoch+1}/{epochs}, Loss: {epoch_loss:.4f}")
+        
+        # Step the scheduler based on the loss
+        current_lr = optimizer.param_groups[0]['lr']
+        print(f"Epoch {epoch+1}/{epochs}, Loss: {epoch_loss:.4f}, LR: {current_lr:.6f}")
+        
+        # Update the learning rate if loss has plateaued
+        scheduler.step(epoch_loss)
 
 # ----------------------------------------------------------------------
 
-# Update DataLoader tuple type to reflect the 3 outputs (X, y, length)
 def evaluate_model(
-    model: nn.Module, dataloader: DataLoader[Tuple[torch.Tensor, torch.Tensor, torch.Tensor]]
+    model: nn.Module, dataloader: DataLoader
 ):
     """
-    Evaluates a PyTorch LSTM model on a given dataset, handling padding via packing.
+    Evaluates a PyTorch LSTM model on a given dataset.
     """
     model.eval()
     correct = 0
     total = 0
     with torch.no_grad():
-        # CRITICAL CHANGE 1: Unpack 3 items (inputs, labels, lengths)
         for inputs, labels, lengths in dataloader:
             
-            # NOTE: Sorting is now handled inside model_utils.py
-
-            # 2. Move data to device
             inputs, labels = inputs.to(DEVICE), labels.to(DEVICE)
             
-            # 3. Pass inputs AND sequence lengths to the model
             outputs = model(inputs, lengths) 
             
             _, predicted = torch.max(outputs.data, 1)

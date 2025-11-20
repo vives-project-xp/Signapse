@@ -11,14 +11,8 @@ THIS_DIR = Path(__file__).parent
 
 # Data is currently located at: SMARTGLASSES/notebooks/package/smart_gestures/gestures/lstm_model/dataset
 # Calculate the default path relative to data_utils.py (which is in SMARTGLASSES/notebooks/training/lstm_model/)
-DEFAULT_DATA_PATH = (
-    THIS_DIR.parents[1] 
-    / "package"
-    / "smart_gestures"
-    / "gestures"
-    / "lstm_model"
-    / "dataset"
-)
+DEFAULT_DATA_PATH = (THIS_DIR / "data")
+print(DEFAULT_DATA_PATH)
 
 # DATA_PATH uses the environment variable if available, otherwise it uses the corrected default path.
 DATA_PATH = Path(os.getenv("LAKEFS_DATA_PATH")) if os.getenv("LAKEFS_DATA_PATH") else DEFAULT_DATA_PATH
