@@ -99,9 +99,16 @@ docker --version
 ### Client Dependencies (React Native/Expo)
 
 !!! note "Next Steps"
-    See [Client setup & run](./Development/Client) for the client setup and how to start the Expo development server.
+    See [Client setup & run](./Development/Client/README.md) for the client setup and how to start the Expo development server.
 
 ### Notebook Dependencies (Optional - for AI/ML development)
 
-!!! note "Next Steps"
+!!! warning "Next Steps"
     See [Notebooks setup & run](./Development/notebooks.md) for details on installing notebook dependencies and running notebooks.
+
+## Step 6: Building
+
+!!! note "Next Steps"
+    See [Building the Application](./Development/buildingGuide.md) for instructions on how to build and run the Signapse application.
+
+
