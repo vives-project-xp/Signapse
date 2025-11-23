@@ -1,4 +1,5 @@
-!!! warning This file serves as a reference for understanding npm and npx. For installation or setup, see the [Getting Started](../Getting%20Started/README.md) folder.
+!!! warning 
+	This file serves as a reference for understanding npm and npx. For installation or setup, see the [Getting Started](../Getting%20Started/README.md) folder.
 
 # npm & npx — Info
 
@@ -55,6 +56,7 @@ Execute scripts via CLI:
 npm run start
 npm run test
 ```
+
 ---
 
 ### Using npx

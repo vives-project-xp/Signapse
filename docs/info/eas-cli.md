@@ -1,7 +1,9 @@
+!!! warning
+	This file serves as a reference for understanding EAS-CLI. For installation or setup, see the [Getting Started](../Getting%20Started/README.md) folder of your Expo project.
+
 # EAS-CLI — Info
 (Expo Application Services Command Line Interface)
 
-!!! warning This file serves as a reference for understanding EAS-CLI. For installation or setup, see the [Getting Started](../Getting%20Started/README.md) folder of your Expo project.
 
 
 
@@ -308,6 +310,7 @@ eas build --platform ios --profile development # This  will create a build that 
 | `eas build:purge`                  | Deletes old builds                   |
 
 **submit**
+
 | Command                               | Description                |
 | ------------------------------------- | -------------------------- |
 | `eas submit`                          | Start submission flow      |
@@ -318,6 +321,7 @@ eas build --platform ios --profile development # This  will create a build that 
 | `eas submit:credentials`              | Manage submission creds    |
 
 **Updates**
+
 | Command                      | Description                  |
 | ---------------------------- | ---------------------------- |
 | `eas update`                 | Publish an OTA update        |
@@ -328,6 +332,7 @@ eas build --platform ios --profile development # This  will create a build that 
 | `eas update:status`          | Check status of last update  |
 
 **credentials**
+
 | Command                         | Description                     |
 | ------------------------------- | ------------------------------- |
 | `eas credentials`                | Manage app signing credentials  |
@@ -338,6 +343,7 @@ eas build --platform ios --profile development # This  will create a build that 
 | `eas credentials:upload`         | Upload local credentials        |
 
 **devices**
+
 | Command                     | Description                        |
 | --------------------------- | ---------------------------------- |
 | `eas device:create`         | Register a new iOS device          |
